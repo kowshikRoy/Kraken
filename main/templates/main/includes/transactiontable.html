@@ -1,0 +1,9 @@
+{% for p in transaction %}
+<tr>
+	<td>{{p.voucher.client}}</td>
+	<td>{{p.volume}}</td>
+	<td>{{p.amount}}</td>
+	<td>{{p.voucher.date}}</td>
+	<td><span class="label label-success">COMPLETED</span></td>
+</tr>
+{% endfor %}

@@ -1,0 +1,21 @@
+{% if page.has_other_pages %}
+  <ul id="pagination" class="pagination" style="margin-top: 0px; margin-bottom: 0px">
+    {% if page.has_previous %}
+      <li><a href="{{ page.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in page_range %}
+      {% if page.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% else %}
+        <li><a href="{{ i }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if page.has_next %}
+      <li><a href="{{ page.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+{% endif %}

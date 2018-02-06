@@ -1,0 +1,40 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	{{ weekReport. data}}
+
+	<div id = "container" >
+	</div>
+
+	<input type="submit" name="Click" id = "button">
+	<script src="{% static 'js/ajax.js' %}"></script>
+	<script src="{% static 'js/Chart.js' %}"></script>
+	<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+	<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/klorofil-common.js' %}"></script>
+	<script src="{% static 'vendor/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+	<script src="{% static 'vendor/chartist/js/chartist.min.js' %}"></script>
+	<script src="{% static 'vendor/jquery.easy-pie-chart/jquery.easypiechart.min.js' %}"></script>
+
+	<script type="text/javascript">
+		$(function() {
+			$('#button').click( function(){
+				$.ajax({
+		            type: "GET",
+		            url: '/api/check',
+		            dataType: 'json',
+		            success: function(data){
+		                console.log(data);
+		                $('#container').html( data.div);
+		           } ,
+		            
+		        });
+			});
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+{% extends 'main/base.html' %}
+{% block main %}
+<div class="main">
+	<!-- MAIN CONTENT -->
+	<div class="main-content">
+		<div class="container-fluid">
+			<!-- OVERVIEW -->
+			<!-- END OVERVIEW -->
+			<div class="panel panel-headline" style="background-color: #fafafa">
+				<div class="panel-heading">
+					<div class="right">
+						<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+						<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+					</div>
+					<h3 class="panel-title">Weekly Overview</h3>
+					<p class="panel-subtitle">{{weekBegin}}- {{weekEnd}}</p>
+					
+				</div>
+				<div class="panel-body no-padding">
+					<div class="row">
+						<div class="col-md-6">
+							<!-- RECENT PURCHASES -->
+							<div class="panel">
+								<div class="panel-heading">
+									<h3 class="panel-title">Top Clients</h3>
+									
+								</div>
+								<div class="panel-body no-padding">
+									<table class="table table-striped">
+										<thead>
+											<tr>
+												<th>Client Name</th>
+												<th>Amount</th>
+												<th>Status</th>
+											</tr>
+										</thead>
+										<tbody id="weekTable">
+										</tbody>
+									</table>
+								</div>
+								
+
+
+								<div class="panel-footer">
+									
+									<div class="row">
+										<div class="col-md-6">
+											<div id="weekPaginator">
+											</div>
+										</div>
+										<div class="col-md-6 text-right"><a href="#" class="btn btn-primary">View All Purchases</a></div>
+									</div>
+								</div>
+							</div>
+							<!-- END RECENT PURCHASES -->
+						</div>
+						<div class="col-md-6">
+							<!-- MULTI CHARTS -->
+							<div class="panel">
+								<div class="panel-heading">
+									<h3 class="panel-title">Projection vs. Realization</h3>
+									
+								</div>
+								<div class="panel-body">
+									<!-- <div id="visits-trends-chart" class="ct-chart"></div> -->
+									<canvas id="weekChart" height="298px"></canvas>
+								</div>
+							</div>
+							<!-- END MULTI CHARTS -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-headline" style="background-color: #fafafa">
+				<div class="panel-heading" >
+					<div class="right">
+						<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+						<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+					</div>
+					<h3 class="panel-title">Monthly Overview</h3>
+					<p class="panel-subtitle">{{monthBegin}}- {{monthEnd}}</p>
+					
+				</div>
+				<div class="panel-body no-padding">
+					<div class="row">
+						<div class="col-md-6">
+							<!-- RECENT PURCHASES -->
+							<div class="panel">
+								<div class="panel-heading">
+									<h3 class="panel-title">Top Clients</h3>
+									
+								</div>
+								<div class="panel-body no-padding">
+									<table class="table table-striped">
+										<thead>
+											<tr>
+												<th>Client Name</th>
+												<th>Amount</th>
+												<th>Status</th>
+											</tr>
+										</thead>
+										<tbody id="monthTable">
+										</tbody>
+									</table>
+								</div>
+								
+
+
+								<div class="panel-footer">
+									
+									<div class="row">
+										<div class="col-md-6">
+											<div id="monthPaginator">
+											</div>
+										</div>
+										<div class="col-md-6 text-right"><a href="#" class="btn btn-primary">View All Purchases</a></div>
+									</div>
+								</div>
+							</div>
+							<!-- END RECENT PURCHASES -->
+						</div>
+						<div class="col-md-6">
+							<!-- MULTI CHARTS -->
+							<div class="panel">
+								<div class="panel-heading">
+									<h3 class="panel-title">Projection vs. Realization</h3>
+									
+								</div>
+								<div class="panel-body">
+									<!-- <div id="visits-trends-chart" class="ct-chart"></div> -->
+									<canvas id="monthChart" height="298px"></canvas>
+								</div>
+							</div>
+							<!-- END MULTI CHARTS -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-headline" style="background-color: #fafafa">
+				<div class="panel-heading">
+					<div class="right">
+						<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+						<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+					</div>
+					<h3 class="panel-title">Yearly Overview</h3>
+					<p class="panel-subtitle">{{yearBegin}} - {{yearEnd}}</p>
+					
+				</div>
+				<div class="panel-body no-padding">
+					<div class="row">
+						<div class="col-md-6">
+							<!-- RECENT PURCHASES -->
+							<div class="panel">
+								<div class="panel-heading">
+									<h3 class="panel-title">Top Clients</h3>
+									
+								</div>
+								<div class="panel-body no-padding">
+									<table class="table table-striped">
+										<thead>
+											<tr>
+												<th>Client Name</th>
+												<th>Amount</th>
+												<th>Status</th>
+											</tr>
+										</thead>
+										<tbody id= "yearTable">							
+										</tbody>
+									</table>
+								</div>
+								
+
+
+								<div class="panel-footer">
+									
+									<div class="row">
+										<div class="col-md-6">
+											<div id ="yearPaginator">
+											</div>
+
+										</div>
+										<div class="col-md-6 text-right"><a href="#" class="btn btn-primary">View All Purchases</a></div>
+									</div>
+								</div>
+							</div>
+							<!-- END RECENT PURCHASES -->
+						</div>
+						<div class="col-md-6">
+							<!-- MULTI CHARTS -->
+							<div class="panel">
+								<div class="panel-heading">
+									<h3 class="panel-title">Projection vs. Realization</h3>
+									
+								</div>
+								<div class="panel-body">
+									<!-- <div id="visits-trends-chart" class="ct-chart"></div> -->
+									<canvas id="yearChart" height="298px"></canvas>
+								</div>
+							</div>
+							<!-- END MULTI CHARTS -->
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<!-- END MAIN CONTENT -->
+</div>
+<div class="clearfix"></div>
+{% endblock %}
+
+{% block stat %}
+
+<script>
+
+//Load Default Week, Month, Year table
+var bgColor =  [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ];
+        var borderColor =  [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ];
+$(function(){
+	// Load Default week, month & year data
+
+	var endpoint = '/api/clients/';
+	$.ajax({
+		method 	:"GET",
+		url		:endpoint,
+		success	:function(data) {
+			
+			$('#weekTable').html(data.weekTable);
+			$('#weekPaginator').html(data.weekPaginator);
+			var ctx = document.getElementById("weekChart").getContext('2d');
+			new Chart(ctx, {
+			    type: 'line',
+			    data: {
+			        labels: data.weekLabels,
+			        datasets: [{
+			            label: 'Amount',
+			            data: data.weekData,
+			            backgroundColor: bgColor,
+			            borderColor: borderColor,
+			            borderWidth: 1,
+			        }]
+			    },
+			});
+			$('#monthTable').html(data.monthTable);
+			$('#monthPaginator').html(data.monthPaginator);
+			var ctx1 = document.getElementById("monthChart").getContext('2d');
+			new Chart(ctx1, {
+			    type: 'line',
+			    data: {
+			        labels: data.monthLabels,
+			        datasets: [{
+			            label: 'Amount',
+			            data: data.monthData,
+			            backgroundColor: bgColor,
+			            borderColor: borderColor,
+			            borderWidth: 1,
+			        }]
+			    },
+			});
+			
+			$('#yearTable').html(data.yearTable);
+			$('#yearPaginator').html(data.yearPaginator);
+			var ctx2 = document.getElementById("yearChart").getContext('2d');
+			new Chart(ctx2, {
+			    type: 'line',
+			    data: {
+			        labels: data.yearLabels,
+			        datasets: [{
+			            label: 'Amount',
+			            data: data.yearData,
+			            backgroundColor: bgColor,
+			            borderColor: borderColor,
+			            borderWidth: 1,
+			        }]
+			    },
+			});
+
+
+			
+		}
+	});
+
+	$('#weekPaginator').on('click', 'a', function(e){
+			console.log($(this).attr('href'));
+			e.preventDefault(); 
+			
+			$.ajax({
+	            type: "GET",
+	            url: '/api/clients/week/'+ $(this).attr('href'),
+	            success: function(data){
+	            	console.log(data);
+	               	$('#weekTable').html(data.Table);
+					$('#weekPaginator').html(data.Paginator);
+					var ctx = document.getElementById("weekChart").getContext('2d');
+					new Chart(ctx, {
+					    type: 'line',
+					    data: {
+					        labels: data.Labels,
+					        datasets: [{
+					            label: 'Amount',
+					            data: data.Data,
+					            backgroundColor: bgColor,
+					            borderColor: borderColor,
+					            borderWidth: 1,
+					        }]
+					    },
+					});
+
+	           	} ,
+            
+        	});
+           
+		}); 
+		$('#monthPaginator').on('click', 'a', function(e){
+				console.log($(this).attr('href'));
+				e.preventDefault(); 
+				
+				$.ajax({
+		            type: "GET",
+		            url: '/api/clients/month/'+ $(this).attr('href'),
+		            success: function(data){
+		                $('#monthTable').html(data.Table);
+						$('#monthPaginator').html(data.Paginator);
+						var ctx1 = document.getElementById("monthChart").getContext('2d');
+						new Chart(ctx1, {
+						    type: 'line',
+						    data: {
+						        labels: data.Labels,
+						        datasets: [{
+						            label: 'Amount',
+						            data: data.Data,
+						            backgroundColor: bgColor,
+						            borderColor: borderColor,
+						            borderWidth: 1,
+						        }]
+						    },
+						});
+
+		           	} ,
+	            
+	        	});
+	           
+			}); 
+			$('#yearPaginator').on('click', 'a', function(e){
+					console.log($(this).attr('href'));
+					e.preventDefault(); 
+					
+					$.ajax({
+			            type: "GET",
+			            url: '/api/clients/year/'+ $(this).attr('href'),
+			            success: function(data){
+			                $('#yearTable').html(data.Table);
+							$('#yearPaginator').html(data.Paginator);
+							var ctx2 = document.getElementById("yearChart").getContext('2d');
+							new Chart(ctx2, {
+							    type: 'line',
+							    data: {
+							        labels: data.Labels,
+							        datasets: [{
+							            label: 'Amount',
+							            data: data.Data,
+							            backgroundColor: bgColor,
+							            borderColor: borderColor,
+							            borderWidth: 1,
+							        }]
+							    },
+							});
+
+			           	} ,
+		            
+		        	});
+		           
+				}); 
+});
+</script>
+
+{% endblock %}
