@@ -2,8 +2,8 @@
 	<div class="sidebar-scroll">
 		<nav>
 			<ul class="nav">
-				<li><a href="{% url 'index' %}" class="active"><i class="lnr lnr-home"></i> <span>Dashboard</span></a></li>
-				<li><a href="{% url 'clients' %}" class=""><i class="lnr lnr-code"></i> <span>Clients</span></a></li>
+				<li><a href="{% url 'index' %}" {% if option == "home" %} class="active" {% endif %} ><i class="lnr lnr-home"></i> <span>Dashboard</span></a></li>
+				<li><a href="{% url 'clients' %}" {% if option == "clients" %} class="active" {% endif %}><i class="lnr lnr-code"></i> <span>Clients</span></a></li>
 				<li><a href="charts.html" class=""><i class="lnr lnr-chart-bars"></i> <span>Charts</span></a></li>
 				<li><a href="panels.html" class=""><i class="lnr lnr-cog"></i> <span>Panels</span></a></li>
 				<li><a href="notifications.html" class=""><i class="lnr lnr-alarm"></i> <span>Notifications</span></a></li>

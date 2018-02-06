@@ -358,12 +358,12 @@ class LoadDefaultClients(APIView):
 			'yearPaginator': render_to_string('main/includes/Paginator.html', {'page': pageYear, 'page_range': pg }),
 
 			'weekTable'		: render_to_string('main/includes/clientTable.html', {'page' : pageWeek}),
-			'weekData'		: yearData[pageWeek.start_index()-1: pageWeek.end_index()],
+			'weekData'		: weekData[pageWeek.start_index()-1: pageWeek.end_index()],
 			'weekLabels'	: [' ']*(pageWeek.end_index()- pageWeek.start_index() + 1),
 			'weekPaginator': render_to_string('main/includes/Paginator.html', {'page': pageWeek, 'page_range': pg }),
 
-			'monthTable'		: render_to_string('main/includes/clientTable.html', {'page' : pagemonth}),
-			'monthData'		: yearData[pagemonth.start_index()-1: pagemonth.end_index()],
+			'monthTable'	: render_to_string('main/includes/clientTable.html', {'page' : pagemonth}),
+			'monthData'		: monthData[pagemonth.start_index()-1: pagemonth.end_index()],
 			'monthLabels'	: [' ']*(pagemonth.end_index()- pagemonth.start_index() + 1),
 			'monthPaginator': render_to_string('main/includes/Paginator.html', {'page': pagemonth, 'page_range': pg }),
 
