@@ -1,7 +1,10 @@
 Django==1.11.8
+Markdown==2.6.11
 Pillow==4.3.0
 dj-database-url==0.4.2
 django-crispy-forms==1.7.0
+django-filter==1.1.0
+djangorestframework==3.7.7
 gunicorn==19.7.1
 olefile==0.44
 psycopg2==2.7.3.2
