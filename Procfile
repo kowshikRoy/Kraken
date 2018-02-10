@@ -1,1 +1,1 @@
-web: gunicorn boipoka.wsgi
+web: gunicorn myproject.wsgi
