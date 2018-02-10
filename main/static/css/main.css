@@ -674,14 +674,14 @@ fieldset[disabled] .btn {
     border-bottom: none; }
     .panel.panel-headline .panel-heading .panel-title {
       margin-bottom: 8px;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: normal; }
     .panel.panel-headline .panel-heading .panel-subtitle {
       margin-bottom: 0;
       font-size: 14px;
       color: #8D99A8; }
       .panel-headline > .panel-heading{
-        font-size: 22px;
+        font-size: 24px;
       }
   .panel.panel-scrolling .btn-bottom {
     margin-bottom: 30px; }
@@ -744,7 +744,7 @@ fieldset[disabled] .btn {
     text-align: right; }
   .metric .number {
     display: block;
-    font-size: 28px;
+    font-size: 19px;
     font-weight: 300; }
   .metric .title {
     font-size: 16px; }
