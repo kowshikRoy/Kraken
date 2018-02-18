@@ -17,20 +17,62 @@ from django.conf.urls import url
 from django.contrib import admin
 
 from .views import (
-    index, 
+    index,
     clients,
-    ChartData, 
-    Check, 
+    ChartData,
+    Check,
     LatestPurchase,
     LatestClient,
-    LoadDefaultClients
+    LoadDefaultClients,
+    loginView,
+    logoutView,
+    test,
+    ProductView,
+    ClientView,
+    RegionView,
+    SalesManView,
+    product,
+    client,
+    region,
+    salesman,
+    LoadProduct,
+    PercentileProduct,
+    PercentileClient,
+    PercentileRegion,
+    PercentileSalesMan
+
+
 )
 urlpatterns = [
+    url(r'^test/$', test),
     url(r'^$', index, name = "index"),
-    url(r'^clients/$', clients, name = "clients"),
+    url(r'^login/',loginView, name= "login"),
+    url(r'^logout/', logoutView, name= "logout"),
+    url(r'^p/(?P<id>[0-9]+)/$', product, name= 'product'),
+    url(r'^c/(?P<id>[0-9]+)/$', client, name= 'client'),
+    url(r'^r/(?P<id>[0-9]+)/$', region, name= 'region'),
+    url(r'^s/(?P<id>[0-9]+)/$', salesman, name= 'salesman'),
+    url(r'^cients/$', clients, name = "clients"),
+    url(r'^api/Product/$', ProductView.as_view()),
+    url(r'^api/Client/$', ClientView.as_view()),
+    url(r'^api/Region/$', RegionView.as_view()),
+    url(r'^api/SalesMan/$', SalesManView.as_view()),
+    url(r'^api/LoadProduct/$', LoadProduct.as_view()),
+    url(r'^api/percentile/product/$', PercentileProduct.as_view()),
+    url(r'^api/percentile/client/$', PercentileClient.as_view()),
+    url(r'^api/percentile/region/$', PercentileRegion.as_view()),
+    url(r'^api/percentile/salesman/$', PercentileSalesMan.as_view()),
+
+
+
+
+
+
+
+
     url(r'^api/transaction/$', LatestPurchase.as_view()),
-    url(r'^api/transaction/(?P<page>[0-9]+)/$', LatestPurchase.as_view()),
-    url(r'^api/check/$', Check.as_view()),
+    # url(r'^api/Lransaction/(?P<page>[0-9]+)/$', LatestPurchase.as_view()),
+    # url(r'^api/check/$', Check.as_view()),
     url(r'^api/clients/$', LoadDefaultClients.as_view()),
     url(r'^api/clients/(?P<type>[a-z]+)/$', LatestClient.as_view()),
     url(r'^api/clients/(?P<type>[a-z]+)/(?P<page>[0-9]+)/$', LatestClient.as_view()),

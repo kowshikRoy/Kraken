@@ -12,9 +12,10 @@
 	<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
 	<link rel="stylesheet" href="{% static 'vendor/linearicons/style.css' %}">
 	<link rel="stylesheet" href="{% static 'vendor/chartist/css/chartist-custom.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/DataTables/datatables.min.css' %}"/>
 
 	<!-- MAIN CSS -->
-	<link rel="stylesheet" href="{% static 'css/main.css' %}">
+	<link rel="stylesheet" href="{% static 'css/main-edited.css' %}">
 	<!-- FOR DEMO PURPOSES ONLY. You should remove this in your project -->
 	<link rel="stylesheet" href="{% static 'css/demo.css' %}">
 	<!-- GOOGLE FONTS -->
@@ -22,6 +23,7 @@
 		@font-face {
 		    font-family: "Source Sans Pro";
 		    src:url("{% static 'fonts/SourceSansPro-Regular.ttf' %}");
+		    font-weight: 400;
 		}
 		@font-face {
 		    font-family: "Source Sans Pro";
@@ -37,28 +39,28 @@
 
 <body>
 	<div id="wrapper">
-		{% include 'main/includes/navbar.html' %}
-		
 		{% block main %}
 
 		{% endblock %}
 	</div>
 
-	
+
 	<footer>
-			<div class="container-fluid">
-				<p class="copyright">&copy; 2017 <a href="https://www.themeineed.com" target="_blank">Theme I Need</a>. All Rights Reserved.</p>
-			</div>
-		</footer>
-	<script src="{% static 'js/ajax.js' %}"></script>
+		<div class="container-fluid">
+			<p class="copyright">&copy; 2017 <a href="https://www.themeineed.com" target="_blank">Theme I Need</a>. All Rights Reserved.</p>
+		</div>
+	</footer>
+	
 	<script src="{% static 'js/Chart.js' %}"></script>
+	<script src="{% static 'js/palette.js' %}"></script>
+	<script src="{% static 'js/main.js' %}"></script>
 	<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
 	<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
 	<script src="{% static 'js/klorofil-common.js' %}"></script>
 	<script src="{% static 'vendor/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
 	<script src="{% static 'vendor/chartist/js/chartist.min.js' %}"></script>
 	<script src="{% static 'vendor/jquery.easy-pie-chart/jquery.easypiechart.min.js' %}"></script>
-
+	<script src="{% static 'vendor/DataTables/datatables.min.js' %}"></script>
 	{% block stat %}
 	{% endblock %}
 </body>

@@ -1,0 +1,66 @@
+{% extends 'main/base.html' %}
+{% block main %}
+{% include 'main/includes/navbar.html' %}
+{% include 'main/includes/left-sidebar.html'  %}
+<div class="main">
+      <div class="main-content">
+      	<div class="container-fluid">
+                  <h3 class="page-title">{{product.name}}</h3>
+                  {% include 'main/includes/chart.html'     with  id="productOnly" heading="Product Behavior in Year" %}
+                  {% include 'main/includes/chart.html'     with  id="productSeason" heading="Product Behavior in Season"  %}
+                  {% include 'main/includes/chart.html'     with  id="productTime" heading="Product Behavior" %}
+                  {% include 'main/includes/chart.html'     with  id="prediction-Product" heading="Product Prediction" %}
+              
+                  
+            </div>
+
+      </div>
+</div>
+
+{% endblock main%}
+
+{% block stat %}
+<script type="text/javascript">
+  function LoadProduct(product = null, beginDate = null, endDate = null) {
+      console.log(product);
+        $.ajax({
+              method      :"GET",
+              url         :'/api/LoadProduct/' ,
+              data        : {
+                    'beginDate' : beginDate,
+                    'endDate'   : endDate,
+                    'product'   : product,
+              },
+              success: function(data){
+
+                    drawChart(document.getElementById('productSeason'),'bar', data['season'])
+                    drawChart(document.getElementById('productTime'),'bar' , data['year'] )
+                    drawChart(document.getElementById('productOnly'),'bar', data['onlyThisYear'])
+
+              } ,
+        });
+  }
+  function LoadPrediction(modelName, queryId) {
+        $.ajax({
+              method      :"GET",
+              url         :'/api/predict/' +  modelName,
+              data        : {
+                    'model'   : modelName,
+                    'id'      : queryId,
+              },
+              success: function(data){
+                  drawOneChart(document.getElementById('prediction-'+modelName),'line', data)
+              } ,
+        });
+  }
+   $(function() {
+            
+            LoadProduct("{{product.id}}");
+            LoadPrediction("Product", "{{product.id}}");
+
+
+      });
+
+</script>
+
+{% endblock %}

@@ -6,10 +6,10 @@ import django
 django.setup()
 
 import time
-from datetime import date 
+from datetime import date
 
-
-from main.models import Region, Client,Product,SalesMan,Voucher,Transaction
+from django.contrib.auth.models import User
+from main.models import Region, Client,Product,SalesMan,Voucher,Transaction,Profile,Company
 import random
 import string
 
@@ -33,43 +33,79 @@ def randomDate(start, end, prop):
 
 
 def populate():
+	#User
+	for i in range(2):
+		username	= randomStr(10)
+		email		= randomStr(10) + '@gmail.com'
+		password	= randomStr(10)
+		user 		= User.objects.get_or_create(username= username,
+			email = email)[0]
+		user.set_password('123456789zr')
+		user.save()
+	users = User.objects.all()
+
+
+
+	#Company
+	Company.objects.all().delete()
+	for i in range(len(users)):
+		inp  = randomStr()
+		description = randomStr(20)
+		company = Company.objects.get_or_create(name = inp, description = description)[0]
+		print(str(company))
+
+	companies = Company.objects.all()
+
+	#Profile & Admin
+	for i in range(len(users)):
+		user = users[i]
+		company  = companies[i]
+		is_admin = True
+		profile = Profile.objects.get_or_create(user = user, company = company,	is_admin = is_admin)[0]
+		print(str(profile))
+
+
 	#Region Populate
-	# Region.objects.all().delete()
-	# for i in range(10):
-	# 	inp = randomStr()
-	# 	region = Region.objects.get_or_create(name = inp)[0]
-	# 	print("{0} - {1}".format(region.id, inp))
+	Region.objects.all().delete()
+	for i in range(10):
+		inp = randomStr()
+		region = Region.objects.get_or_create(name = inp)[0]
+		print("{0} - {1}".format(region.id, inp))
 
 	regions = Region.objects.all()
 
 
 
-	# #Client Populate
-	# Client.objects.all().delete()
-	# for i in range(20):
-	# 	name = randomStr(20)
-	# 	region = random.choice(regions)
-	# 	client =  Client.objects.get_or_create(name = name, region = region)[0]
-	# 	print("{0} - {1}".format( client.id, client.name, client.region.name))
+	#Product Populate
+	Product.objects.all().delete()
+	for i in range(20):
+		inp = randomStr()
+		company= companies[i % len(companies)]
+		product = Product.objects.get_or_create(name = inp, company = company)[0]
+		print("{0} - {1}".format(product.id, product.name))
 
+	products = Product.objects.all()
+
+
+
+	# Client Populate
+	Client.objects.all().delete()
+	for i in range(20):
+		name = randomStr(20)
+		region = random.choice(regions)
+		company= companies[i % len(companies)]
+		client =  Client.objects.get_or_create(name = name, company = company, region = region)[0]
+		print("{0} - {1}".format( client.id, client.name, client.region.name))
 
 
 	clients = Client.objects.all()
 
-	#Product Populate
-	# Product.objects.all().delete()
-	# for i in range(10):
-	# 	inp = randomStr()
-	# 	product = Product.objects.get_or_create(name = inp)[0]
-	# 	print("{0} - {1}".format(product.id, product.name))
-
-	products = Product.objects.all()
-
 	# SalesMan.objects.all().delete()
-	# for i in range(10):
-	# 	inp = randomStr()
-	# 	salesMan = SalesMan.objects.get_or_create(name = inp)[0]
-	# 	print("{0} - {1}".format(salesMan.id, salesMan.name))
+	for i in range(10):
+		inp = randomStr()
+		company= companies[i % len(companies)]
+		salesMan = SalesMan.objects.get_or_create(name = inp, company = company)[0]
+		print("{0} - {1}".format(salesMan.id, salesMan.name))
 
 	sellers	= SalesMan.objects.all()
 
@@ -80,20 +116,21 @@ def populate():
 	for i in range(80):
 		inp 	= randomStr(10)
 		client 	= random.choice(clients)
+		company= companies[i % len(companies)]
 		dates 	= randomDate("2017-01-01", today.strftime('%Y-%m-%d'), random.random())
 		voucher = Voucher.objects.get_or_create(voucher_no = inp, client = client, date = dates)
-		
+
 
 	vouchers = Voucher.objects.all()
 
 	Transaction.objects.all().delete()
 	for i in range(200):
-		seller 		= random.choice(sellers)
 		voucher 	= random.choice(vouchers)
-		product 	= random.choice(products)
+		seller 		= random.choice(sellers.filter(company = voucher.client.company))
+		product 	= random.choice(products.filter(company = voucher.client.company))
 		volume		= random.randint(1,10)
 		amount		= random.randint(0,1000)
-		trans 		= Transaction.objects.get_or_create(seller= seller, voucher = voucher, product = product, 
+		trans 		= Transaction.objects.get_or_create(seller= seller, voucher = voucher, product = product,
 			volume=volume, amount = amount)
 		print(i)
 

@@ -1,6 +1,23 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.urls import reverse
+class Company(models.Model):
+	name 		= models.CharField(max_length = 100)
+	description = models.CharField(max_length = 1000)
+	created_at	= models.DateTimeField(auto_now = True)
 
-# Create your models here.
+	def __str__(self):
+		return self.name
+
+class Profile(models.Model):
+	user 		= models.OneToOneField(User)
+	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
+	is_admin	= models.BooleanField(default = True)
+
+	def __str__(self):
+		return self.user.username
+
+
 class Region(models.Model):
 	name 		= models.CharField(max_length = 120)
 	def __str__(self):
@@ -9,12 +26,17 @@ class Region(models.Model):
 
 class Product(models.Model):
 	name 		= models.CharField(max_length = 120)
+	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
 	def __str__(self):
 		return self.name
+
+	def get_absolute_url(self):
+		return reverse('product', kwargs= {'id': self.id})
 
 
 class Client(models.Model):
 	name 		= models.CharField(max_length = 120, blank = False, null = False)
+	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
 	region		= models.ForeignKey(Region, on_delete = models.CASCADE)
 	def __str__(self):
 		return self.name
@@ -22,6 +44,7 @@ class Client(models.Model):
 
 class SalesMan(models.Model):
 	name		= models.CharField(max_length = 120)
+	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
 	def __str__(self):
 		return self.name
 

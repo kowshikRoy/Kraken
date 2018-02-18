@@ -1,0 +1,52 @@
+{% extends 'main/base.html' %}
+{% block main %}
+{% include 'main/includes/navbar.html' %}
+{% include 'main/includes/left-sidebar.html'  %}
+<div class="main">
+      <div class="main-content">
+      	<div class="container-fluid">
+                  <h3 class="page-title">{{region.name}}</h3>
+                  {% include 'main/includes/tableView.html' with  heading="Product" control="no" %}
+                  
+            </div>
+
+      </div>
+</div>
+
+{% endblock main%}
+
+{% block stat %}
+<script type="text/javascript">
+   $(function() {
+            LoadTable("Product", "volume", 1, null, null,null, null, {{region.id}}, null);
+            LoadTable("Product", "tk", 1, null, null,null, null, {{region.id}}, null);
+
+      });
+   $('.paging').on('click', 'a', function(e){
+        e.preventDefault(); 
+        var info = $(this).attr('href').split('-');
+        var id  = info[0] + "-" + info[1] + '-choose';
+        
+        console.log(id);
+        var beginDate = document.getElementById(id + "-beginDate").value;
+        var endDate = document.getElementById(id + "-endDate").value;
+        var e = document.getElementById(id + "-product");
+        var product = '', client = '', region= '', salesman = '';
+
+        if(e!= null) product = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(id + "-client");
+        if(e != null) client = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(id + "-region");
+        if(e != null) region = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(id + "-salesman");
+        if(e != null) salesman =e.options[e.selectedIndex].value;
+
+        LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,{{region.id}},salesman);
+      }); 
+
+</script>
+
+{% endblock %}

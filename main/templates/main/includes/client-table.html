@@ -1,0 +1,24 @@
+<table class="table table-condensed table-hover"
+<thead>
+      <tr>
+      
+            <th>Client Name</th>
+            <th>Region</th>
+            <th>Amount</th>
+            <th>Volume</th>
+      </tr>
+</thead>
+<tbody>
+
+{% for p,vol,tk in objects %}
+<tr >
+	<td><a href="{% url 'client' p.id %}">{{p.name}}</td>
+      <td><a href="{% url 'region' p.region.id %}">{{p.region}}</td>
+	<td>{{tk}}</td>
+	<td>{{vol}}</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>

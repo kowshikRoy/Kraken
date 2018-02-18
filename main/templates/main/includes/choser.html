@@ -1,0 +1,88 @@
+
+      <div class="collapse" id="{{id}}">
+            <div class="panel-footer">
+            <div class="card card-block">
+                 
+                  <form class="form" id ="{{id}}">
+                        <div class="form-group row">
+                              <label for="staticEmail" class="col-sm-3 col-form-label">Begin Date</label>
+                              <div class="col-sm-9">
+                                    <!-- <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="email@example.com"> -->
+                                    <input type="date" name="bday" id="{{id}}-beginDate" class="form-control">
+                              </div>
+                        </div>
+                        <div class="form-group row">
+                              <label for="staticEmail" class="col-sm-3 col-form-label">End Date</label>
+                              <div class="col-sm-9">
+                                    <!-- <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="email@example.com"> -->
+                                    <input type="date" name="bday" id="{{id}}-endDate" class="form-control">
+                              </div>
+                        </div>
+                        {% if heading == "Product" %}
+                        {% else %}
+                        <div class="form-group row">
+                              <label for="staticEmail" class="col-sm-3 col-form-label">Product</label>
+                              <div class="col-sm-9">
+                                    <select id="{{id}}-product" class="form-control" default="Hi">
+                                          <option value="" selected="selected">All</option>
+                                          {% for entry in products %}
+                                          <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                          {% endfor %}
+                                    </select>
+                              </div>
+                        </div>
+                        {% endif %}
+
+
+                        {% if heading == "Client" %}
+                        {% else %}
+                        <div class="form-group row">
+                              <label for="staticEmail" class="col-sm-3 col-form-label">Client</label>
+                              <div class="col-sm-9">
+                                    <select id="{{id}}-client" class="form-control" default="Hi">
+                                          <option value="" selected="selected">All</option>
+                                          {% for entry in clients %}
+                                          <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                          {% endfor %}
+                                    </select>
+                              </div>
+                        </div>
+                        {% endif %}
+
+
+                        {% if heading == "Region" %}
+                        {% else %}
+                        <div class="form-group row">
+                              <label for="staticEmail" class="col-sm-3 col-form-label">Region</label>
+                              <div class="col-sm-9">
+                                    <select id="{{id}}-region" class="form-control" default="Hi">
+                                          <option value="" selected="selected">All</option>
+                                          {% for entry in regions %}
+                                          <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                          {% endfor %}
+                                    </select>
+                              </div>
+                        </div>
+                        {% endif %}
+
+                        {% if heading == "SalesMan" %}
+                        {% else %}
+                        <div class="form-group row">
+                              <label for="staticEmail" class="col-sm-3 col-form-label">SalesMan</label>
+                              <div class="col-sm-9">
+                                    <select id="{{id}}-salesman" class="form-control" value= "all">
+                                          <option value="" selected="selected">All</option>
+                                          {% for entry in salesMans %}
+                                          <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                          {% endfor %}
+                                    </select>
+                              </div>
+                        </div>
+                        {% endif %}
+                        <div class="form-group row">
+                              <input type="submit" class="btn btn-primary"  name="" value="Submit">
+                        </div>
+                  </form>
+            </div>
+      </div>
+</div>
