@@ -400,7 +400,7 @@ class LoadProduct(APIView):
 		temp = beginDate
 		print(temp)
 		for i in range(13):
-			out = temp.strftime('%b %Y');
+			out = temp.strftime('%b %y');
 			label.append(out)
 			volume[out] = 0
 			tk[out] = 0
@@ -408,7 +408,7 @@ class LoadProduct(APIView):
 			print(out)
 
 		for t in transactions:
-			out  = t.voucher.date.strftime('%b %Y')
+			out  = t.voucher.date.strftime('%b %y')
 			tk[out] += t.amount
 			volume[out] += t.volume
 
