@@ -20,6 +20,8 @@ class Profile(models.Model):
 
 class Region(models.Model):
 	name 		= models.CharField(max_length = 120)
+	latitude	= models.DecimalField(max_digits=9, decimal_places=6)
+	longitude	= models.DecimalField(max_digits=9, decimal_places=6)
 	def __str__(self):
 		return self.name
 
@@ -34,19 +36,21 @@ class Product(models.Model):
 		return reverse('product', kwargs= {'id': self.id})
 
 
-class Client(models.Model):
-	name 		= models.CharField(max_length = 120, blank = False, null = False)
-	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
-	region		= models.ForeignKey(Region, on_delete = models.CASCADE)
-	def __str__(self):
-		return self.name
-
-
 class SalesMan(models.Model):
 	name		= models.CharField(max_length = 120)
 	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
 	def __str__(self):
 		return self.name
+
+
+class Client(models.Model):
+	name 		= models.CharField(max_length = 120, blank = False, null = False)
+	company 	= models.ForeignKey(Company, on_delete= models.CASCADE, null= True)
+	region		= models.ForeignKey(Region, on_delete = models.CASCADE)
+	salesman 	= models.ForeignKey(SalesMan, on_delete = models.CASCADE)
+	def __str__(self):
+		return self.name
+
 
 
 
@@ -64,7 +68,6 @@ class Transaction(models.Model):
             ('Secondary', 'Secondary')
         )
 	t_type	 	= models.CharField(max_length = 20, choices = T_TYPE, default="Primary")
-	seller		= models.ForeignKey(SalesMan, on_delete = models.CASCADE, null = True)
 	product 	= models.ForeignKey(Product, on_delete = models.CASCADE, null = True)
 	voucher 	= models.ForeignKey(Voucher ,on_delete = models.CASCADE, null= True)
 	volume		= models.IntegerField(default = 0)
