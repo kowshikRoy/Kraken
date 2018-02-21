@@ -50,6 +50,11 @@ function drawChart(ctx, type, data){
   ],
 },
 options: {
+    elements: {
+            line: {
+                tension: 0, // disables bezier curves
+            }
+        },
  scales: {
   yAxes: [{
    id: 'A',

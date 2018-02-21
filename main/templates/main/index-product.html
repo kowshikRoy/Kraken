@@ -1,0 +1,107 @@
+{% extends 'main/base.html' %}
+{% block main %}
+{% include 'main/includes/navbar.html' %}
+{% include 'main/includes/left-sidebar.html' with option="product" %}
+<div class="main">
+      <div class="main-content">
+      	<div class="container-fluid">
+                 
+      		       {% include 'main/includes/tableView.html' with  heading="Product" %}
+                 {% include 'main/includes/chart.html'     with  id="percentile-product" heading="Product Percentile" %}
+                  
+          </div>
+
+      </div>
+</div>
+
+{% endblock main%}
+
+{% block stat %}
+<script type="text/javascript">
+      function LoadProduct(product = null, beginDate = null, endDate = null) {
+            $.ajax({
+                  method      :"GET",
+                  url         :'/api/LoadProduct/' ,
+                  data        : {
+                        'beginDate' : beginDate,
+                        'endDate'   : endDate,
+                        'product'   : product,
+                  },
+                  success: function(data){
+                      drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear'])
+                      drawChart(document.getElementById('productTime'),'line' , data['year'] )
+                        
+
+                  } ,
+            });
+      }
+
+      function LoadPercentlie(modelName) {
+            $.ajax({
+                  method      :"GET",
+                  url         :'/api/percentile/' + modelName,
+                  data        : {
+                  },
+                  success: function(data){
+                        drawOneChart(document.getElementById('percentile-'+modelName),'bar', data)
+                  } ,
+            });
+      }
+
+      $(function() {
+            LoadProduct();
+            LoadTable("Product", "volume");
+            LoadTable("Product", 'tk');
+
+            LoadPercentlie("product");
+            
+      });
+
+      $("form").submit(function(event){
+            event.preventDefault();
+            var beginDate = document.getElementById(this.id + "-beginDate").value;
+            var endDate = document.getElementById(this.id + "-endDate").value;
+            var e = document.getElementById(this.id + "-product");
+            var product = '', client = '', region= '', salesman = '';
+
+            if(e!= null) product = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-client");
+            if(e != null) client = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-region");
+            if(e != null) region = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-salesman");
+            if(e != null) salesman =e.options[e.selectedIndex].value;
+
+            var info = this.id.split('-');
+            LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
+      });
+      $('.paging').on('click', 'a', function(e){
+        e.preventDefault(); 
+        var info = $(this).attr('href').split('-');
+        var id  = info[0] + "-" + info[1] + '-choose';
+        
+        console.log(id);
+        var beginDate = document.getElementById(id + "-beginDate").value;
+        var endDate = document.getElementById(id + "-endDate").value;
+        var e = document.getElementById(id + "-product");
+        var product = '', client = '', region= '', salesman = '';
+
+        if(e!= null) product = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(id + "-client");
+        if(e != null) client = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(id + "-region");
+        if(e != null) region = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(id + "-salesman");
+        if(e != null) salesman =e.options[e.selectedIndex].value;
+
+        LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
+      }); 
+
+</script>
+{% endblock %}

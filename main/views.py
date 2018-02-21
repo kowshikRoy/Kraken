@@ -28,6 +28,7 @@ def cmp(client):
 
 def test(request):
 	pass
+
 @login_required
 def index(request):
 	return render(request , 'main/index.html', {
@@ -37,6 +38,37 @@ def index(request):
 		'salesMans': SalesMan.objects.all()
 	})
 
+def productIndex(request):
+	return render(request , 'main/index-product.html', {
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()
+	})
+
+def clientIndex(request):
+	return render(request , 'main/index-client.html', {
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()
+	})
+
+def regionIndex(request):
+	return render(request , 'main/index-region.html', {
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()
+	})
+
+def salesmanIndex(request):
+	return render(request , 'main/index-salesman.html', {
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()
+	})
 
 def product(request,*args, **kwargs):
 	product = get_object_or_404(Product.objects.all(), pk =kwargs['id'])
@@ -344,27 +376,27 @@ class LoadProduct(APIView):
 		yearMax = date.today().year
 
 		# Season Data
-		volume = {}
-		tk = {}
-		label = []
+		# volume = {}
+		# tk = {}
+		# label = []
 
-		for i in range(1,13):
-			label.append(date(2012,i,1).strftime('%b'))
-			volume[i] = 0
-			tk[i] = 0
+		# for i in range(1,13):
+		# 	label.append(date(2012,i,1).strftime('%b'))
+		# 	volume[i] = 0
+		# 	tk[i] = 0
 
-		for t in transactions:
-			mon = t.voucher.date.month;
-			tk[mon] += t.amount
-			volume[mon] += t.volume
-			yearMin = min(yearMin, t.voucher.date.year)
-			yearMax = max(yearMax, t.voucher.date.year)
+		# for t in transactions:
+		# 	mon = t.voucher.date.month;
+		# 	tk[mon] += t.amount
+		# 	volume[mon] += t.volume
+		# 	yearMin = min(yearMin, t.voucher.date.year)
+		# 	yearMax = max(yearMax, t.voucher.date.year)
 
-		data['season'] = {
-			'label'		: label,
-			'volume' 	: [volume[i] for i in range(1, 13)],
-			'tk'		: [tk[i] for i in range(1,13)]
-		}
+		# data['season'] = {
+		# 	'label'		: label,
+		# 	'volume' 	: [volume[i] for i in range(1, 13)],
+		# 	'tk'		: [tk[i] for i in range(1,13)]
+		# }
 
 
 		#Year Data
@@ -373,16 +405,29 @@ class LoadProduct(APIView):
 		tk = {}
 		label = []
 
-		for i in range(yearMin, yearMax + 1):
-			label.append(i)
-			volume[i] = 0
-			tk[i] = 0
+		
 
 		for t in transactions:
 			year  = t.voucher.date.year;
-			tk[year] += t.amount
-			volume[year] += t.volume
+			if year in tk: tk[year] += t.amount
+			else : tk[year] = t.amount
 
+
+			if year in volume: volume[year] += t.volume
+			else : volume[year] = t.volume
+
+
+
+			yearMin = min(yearMin, t.voucher.date.year)
+			yearMax = max(yearMax, t.voucher.date.year)
+
+
+		for i in range(yearMin, yearMax + 1):
+			label.append(i)
+			if i not in volume: 
+				volume[i] = 0
+				tk[i] = 0
+			
 
 		data['year'] = {
 			'label'		: label,

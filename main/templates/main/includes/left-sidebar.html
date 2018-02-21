@@ -3,7 +3,10 @@
 		<nav>
 			<ul class="nav">
 				<li><a href="{% url 'index' %}" {% if option == "home" %} class="active" {% endif %} ><i class="lnr lnr-home"></i> <span>Dashboard</span></a></li>
-				<li><a href="{% url 'index' %}" {% if option == "settings" %} class="active" {% endif %} ><i class="lnr lnr-cog"></i> <span>Settings</span></a></li>
+				<li><a href="{% url 'products' %}" {% if option == "product" %} class="active" {% endif %} ><i class="lnr lnr-store"></i> <span>Products</span></a></li>
+				<li><a href="{% url 'clients' %}" {% if option == "client" %} class="active" {% endif %} ><i class="lnr lnr-users"></i> <span>Clients</span></a></li>
+				<li><a href="{% url 'regions' %}" {% if option == "region" %} class="active" {% endif %} ><i class="lnr lnr-location"></i> <span>Regions</span></a></li>
+				<li><a href="{% url 'salesmans' %}" {% if option == "salesman" %} class="active" {% endif %} ><i class="lnr lnr-cog"></i> <span>SalesMans</span></a></li>
 				<!-- <li><a href="{% url 'clients' %}" {% if option == "clients" %} class="active" {% endif %}><i class="lnr lnr-code"></i> <span>Clients</span></a></li>
 				<li><a href="charts.html" class=""><i class="lnr lnr-chart-bars"></i> <span>Charts</span></a></li>
 				<li><a href="panels.html" class=""><i class="lnr lnr-cog"></i> <span>Panels</span></a></li>

@@ -37,7 +37,6 @@ def getPercentile(obj, parts):
     for i in range(len(obj)):
         if (i == stamps[ptr]):
             ptr += 1
-        print(i, ptr)
         out[ptr] += obj[i][1]
 
     return out
