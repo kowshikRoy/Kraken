@@ -6,7 +6,9 @@ from os.path import isfile, join
 import xlrd
 
 # constants
-SALES_FILE_LOCATION = os.getcwd() + '\data\sales'
+DATA_LOCATION = os.path.join(os.getcwd(), 'data')
+
+SALES_FILE_LOCATION = os.path.join(DATA_LOCATION, 'sales')
 SALES_SHEET_NAME = 'Sales Contact Lens Credit'
 
 SALES_COLUMN_IDX_FOR_INVOICE = 3
@@ -17,14 +19,14 @@ SALES_COLUMN_IDX_FOR_PRODUCT_NAME = 0
 SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT = 1
 SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE = 3
 
-DISCOUNT_FILE_LOCATION = os.getcwd() + '\data\discount'
+DISCOUNT_FILE_LOCATION = os.path.join(DATA_LOCATION, 'discount')
 DISCOUNT_SHEET_IDX = 0
 DISCOUNT_COLUMN_IDX_FOR_DATE = 0
 DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME = 2
 DISCOUNT_COLUMN_IDX_FOR_VOUCHER_NO = 4
 DISCOUNT_COLUMN_IDX_FOR_AMOUNT = 5
 
-RETURN_FILE_LOCATION = os.getcwd() + '\data\\return'
+RETURN_FILE_LOCATION = os.path.join(DATA_LOCATION, 'return')
 RETURN_SHEET_IDX = 0
 RETURN_COLUMN_IDX_FOR_DATE = 0
 RETURN_COLUMN_IDX_FOR_CLIENT_NAME = 2
@@ -35,7 +37,7 @@ RETURN_COLUMN_IDX_FOR_AMOUNT = 5
 sales_files = [f for f in listdir(SALES_FILE_LOCATION) if isfile(join(SALES_FILE_LOCATION, f))]
 
 for sales_file in sales_files:
-    file_location = SALES_FILE_LOCATION + '\\' + sales_file
+    file_location = os.path.join(SALES_FILE_LOCATION, sales_file)
     workbook = xlrd.open_workbook(file_location)
     sheet = workbook.sheet_by_name(SALES_SHEET_NAME)
     startRow = 0
@@ -73,7 +75,7 @@ for sales_file in sales_files:
 discount_files = [f for f in listdir(DISCOUNT_FILE_LOCATION) if isfile(join(DISCOUNT_FILE_LOCATION, f))]
 
 for discount_file in discount_files:
-    file_location = DISCOUNT_FILE_LOCATION + '\\' + discount_file
+    file_location = os.path.join(DISCOUNT_FILE_LOCATION, discount_file)
     workbook = xlrd.open_workbook(file_location)
     sheet = workbook.sheet_by_index(DISCOUNT_SHEET_IDX)
     rowIdx = 0
@@ -103,7 +105,7 @@ for discount_file in discount_files:
 return_files = [f for f in listdir(RETURN_FILE_LOCATION) if isfile(join(RETURN_FILE_LOCATION, f))]
 
 for return_file in return_files:
-    file_location = RETURN_FILE_LOCATION + '\\' + return_file
+    file_location = os.path.join(RETURN_FILE_LOCATION, return_file)
     workbook = xlrd.open_workbook(file_location)
     sheet = workbook.sheet_by_index(RETURN_SHEET_IDX)
     rowIdx = 0
