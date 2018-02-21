@@ -98,7 +98,7 @@ class ProductView(APIView):
 		if request.GET['region'] != '':
 			transactions 	= transactions.filter(voucher__client__region__id = request.GET['region'])
 		if request.GET['salesman'] != '':
-			transactions 	= transactions.filter(seller__id = request.GET['salesman'])
+			transactions 	= transactions.filter(voucher__client__salesman__id = request.GET['salesman'])
 
 		products			= Product.objects.all()
 		MapforVolume 	= {}
@@ -108,9 +108,11 @@ class ProductView(APIView):
 			MapForTk[p.id] = 0
 
 		for i in transactions:
+			if i.t_type !='PURCHASE':
+				continue
 			MapForTk[i.product.id] += i.amount
 			MapforVolume[i.product.id] += i.volume
-			print(i.seller.id)
+			
 
 
 		output 		= [(p, MapforVolume[p.id], MapForTk[p.id]) for p in products]
@@ -155,7 +157,7 @@ class ClientView(APIView):
 		if request.GET['endDate'] != '':
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
-		transactions		= Transaction.objects.filte(
+		transactions		= Transaction.objects.filter(
 			voucher__date__gte = beginDate, voucher__date__lte = endDate
 		)
 
@@ -164,7 +166,7 @@ class ClientView(APIView):
 		if request.GET['region'] != '':
 			transactions 	= transactions.filter(voucher__client__region__id = request.GET['region'])
 		if request.GET['salesman'] != '':
-			transactions 	= transactions.filter(seller__id = request.GET['salesman'])
+			transactions 	= transactions.filter(voucher__client__salesman__id = request.GET['salesman'])
 
 		clients			= Client.objects.all()
 		MapforVolume 	= {}
@@ -217,7 +219,7 @@ class RegionView(APIView):
 		if request.GET['endDate'] != '':
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,
+		transactions		= Transaction.objects.filter(
 			voucher__date__gte = beginDate, voucher__date__lte = endDate
 		)
 
@@ -226,7 +228,7 @@ class RegionView(APIView):
 		if request.GET['client'] != '':
 			transactions 	= transactions.filter(voucher__client__id = request.GET['client'])
 		if request.GET['salesman'] != '':
-			transactions 	= transactions.filter(seller__id = request.GET['salesman'])
+			transactions 	= transactions.filter(voucher__client__salesman__id = request.GET['salesman'])
 
 		regions			= Region.objects.all()
 		MapforVolume 	= {}
@@ -280,7 +282,7 @@ class SalesManView(APIView):
 		if request.GET['endDate'] != '':
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,
+		transactions		= Transaction.objects.filter(
 			voucher__date__gte = beginDate, voucher__date__lte = endDate
 		)
 
@@ -291,7 +293,7 @@ class SalesManView(APIView):
 		if request.GET['region'] != '':
 			transactions 	= transactions.filter(voucher__client__region__id = request.GET['region'])
 
-		salesMans			= SalesMan.objects.filter(company = request.user.profile.company)
+		salesMans			= SalesMan.objects.all()
 		MapforVolume 	= {}
 		MapForTk		= {}
 		for r in salesMans:
@@ -299,8 +301,8 @@ class SalesManView(APIView):
 			MapForTk[r.id] = 0
 
 		for i in transactions:
-			MapForTk[i.seller.id] += i.amount
-			MapforVolume[i.seller.id] += i.volume
+			MapForTk[i.voucher.client.salesman.id] += i.amount
+			MapforVolume[i.voucher.client.salesman.id] += i.volume
 
 
 		output 		= [(r, MapforVolume[r.id], MapForTk[r.id]) for r in salesMans]
@@ -333,7 +335,7 @@ class LoadProduct(APIView):
 	permission_classes 		= (IsAuthenticated,)
 
 	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,)
+		transactions		= Transaction.objects.all()
 		if request.GET['product'] != '':
 			transactions 	= transactions.filter(product__id = request.GET['product'])
 
@@ -423,8 +425,8 @@ class PercentileProduct(APIView):
 	permission_classes 		= (IsAuthenticated,)
 
 	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,)
-		products			= Product.objects.filter(company = request.user.profile.company)
+		transactions		= Transaction.objects.all()
+		products			= Product.objects.all()
 
 
 		tk = {}
@@ -433,7 +435,9 @@ class PercentileProduct(APIView):
 		for i in range(1,100,20):
 			label.append(str(i)+"-"+str(i+19)+'%')
 		for p in products: tk[p.id] = 0
-		for t in transactions: tk[t.product.id] += t.amount
+		for t in transactions: 
+			if(t.t_type != 'PURCHASE'): continue
+			tk[t.product.id] += t.amount
 		output = [( p , tk[p.id]) for p in products]
 		output = sorted(output, key = lambda x: x[1], reverse = True)
 
@@ -451,8 +455,8 @@ class PercentileClient(APIView):
 	permission_classes 		= (IsAuthenticated,)
 
 	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,)
-		clients				= Client.objects.filter(company = request.user.profile.company)
+		transactions		= Transaction.objects.all()
+		clients				= Client.objects.all()
 
 
 		tk = {}
@@ -481,7 +485,7 @@ class PercentileRegion(APIView):
 	permission_classes 		= (IsAuthenticated,)
 
 	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,)
+		transactions		= Transaction.objects.all()
 		regions 			= Region.objects.all()
 		data = {}
 
@@ -511,7 +515,7 @@ class PercentileSalesMan(APIView):
 
 	def get(self, request, *args, **kwargs) :
 		transactions		= Transaction.objects.all()
-		salesMans 			= SalesMan.objects.filter(company = request.user.profile.company)
+		salesMans 			= SalesMan.objects.all()
 		data = {}
 
 		tk = {}
@@ -521,7 +525,8 @@ class PercentileSalesMan(APIView):
 			label.append(str(i)+"-"+str(i+19)+'%')
 
 		for r in salesMans: tk[r.id] = 0
-		for t in transactions: tk[t.seller.id] += t.amount
+		for t in transactions: 
+			tk[t.voucher.client.salesman.id] += t.amount
 
 		output = [( p , tk[p.id]) for p in salesMans]
 		output = sorted(output, key = lambda x: x[1], reverse = True)
