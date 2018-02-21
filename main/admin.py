@@ -1,10 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import  Region, Product, Client, SalesMan,Transaction,Voucher,Company,Profile
-
-admin.site.register(Company)
-admin.site.register(Profile)
+from .models import  Region, Product, Client, SalesMan,Transaction,Voucher
 admin.site.register(Region)
 admin.site.register(Product)
 admin.site.register(Client)

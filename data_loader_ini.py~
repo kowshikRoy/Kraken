@@ -1,53 +1,4 @@
 import datetime
-import sys
-import os
-import random
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','myproject.settings')
-
-import django
-django.setup()
-
-import time
-from datetime import date
-from django.contrib.auth.models import User
-from main.models import Region, Client,Product,SalesMan,Voucher,Transaction
-usernames = ['John', 'Zubaer', 'Repon']
-region_names = ['Dhaka','Chittagong', 'Khulna', 'Rajshahi','Barisal','Sylhet','Rangpur','Commilla']
-person_name = ['Ahnaf', 'Shamim', 'Sabbir','Rafi', 'Anik', 'Fardin','Sumon','Rubel','Mahir','Saiful']
-
-
-for i in range(len(usernames)):
-    username    = usernames[i]
-    user        = User.objects.get_or_create(username= username)[0]
-    user.set_password('123456789zr')
-    user.save()
-
-for i in range(len(person_name)):
-    name        = person_name[i]
-    salesman    = SalesMan.objects.get_or_create(name = name)[0]
-    print(salesman)
-
-
-for i in range(len(region_names)):
-    inp         = region_names[i]
-    region      = Region.objects.get_or_create(name = inp)[0]
-
-user = User.objects.get(username = 'John') #User Account
-salesmans = SalesMan.objects.all()
-regions = Region.objects.all()
-Client.objects.all().delete()
-Voucher.objects.all().delete()
-Product.objects.all().delete()
-Transaction.objects.all().delete()
-
-
-
-def check(s):
-    if(s==''): return '0'
-    return s 
-
-import datetime
 import os
 from os import listdir
 from os.path import isfile, join
@@ -93,44 +44,23 @@ for sales_file in sales_files:
     voucherId = -1
     clientId = -1
 
-    voucher     = None
-    client      = None
-    date        = None
-
     while True:
         if sheet.cell_value(startRow, SALES_COLUMN_IDX_FOR_INVOICE) == 'Invoice':
             break
         startRow += 1
 
-    for rowIdx in range(startRow, min(20,sheet.nrows)):
+    for rowIdx in range(startRow, sheet.nrows):
         if sheet.cell_value(rowIdx, 0) == '':
             break
-
-
         if sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_INVOICE) == 'Invoice':
             # clientId = save_client_or_return_client_id_if_exists(
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME))
             # provide random salesmanId and locationId
-
-            client = Client.objects.get_or_create(
-                name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME),
-                region = random.choice(regions),
-                salesman = random.choice(salesmans),
-            )[0]
-
-
             time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_DATE), 0)
             date = datetime.datetime(*time_tuple)
             # voucherId = save_voucher(
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_VOUCHER_NO),
             #                           clientId, date)
-
-            voucher  = Voucher.objects.get_or_create(
-                voucher_no = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_VOUCHER_NO),
-                client = client,
-                date = date,
-                )[0]
-            
         else:
             # assert that clientId and voucherId >= 0
             # productId = save_product_or_return_product_id_if_exists(
@@ -138,24 +68,8 @@ for sales_file in sales_files:
             # save_transaction ('PURCHASE', voucherId, productId,
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))
-
-            product = Product.objects.get_or_create(
-                    name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_NAME),
-                )[0]
-            #print(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))
-            transaction = Transaction.objects.get_or_create(
-                t_type = 'PURCHASE',
-                product = product,
-                voucher = voucher,
-                volume = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)),
-                amount = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE)),
-
-                )[0]
-            
+            print()
         rowIdx += 1
-
-print("Ended Sales ")
-
 
 # read discount data
 discount_files = [f for f in listdir(DISCOUNT_FILE_LOCATION) if isfile(join(DISCOUNT_FILE_LOCATION, f))]
@@ -165,9 +79,6 @@ for discount_file in discount_files:
     workbook = xlrd.open_workbook(file_location)
     sheet = workbook.sheet_by_index(DISCOUNT_SHEET_IDX)
     rowIdx = 0
-    voucher     = None
-    client      = None
-    date        = None
 
     while True:
         if sheet.cell_type(rowIdx, DISCOUNT_COLUMN_IDX_FOR_DATE) == xlrd.XL_CELL_DATE:
@@ -180,11 +91,6 @@ for discount_file in discount_files:
         # clientId = save_client_or_return_client_id_if_exists(
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME))
         # provide random salesmanId and locationId
-        client = Client.objects.get_or_create(
-                name = sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME),
-                region = random.choice(regions),
-                salesman = random.choice(salesmans),
-            )[0]
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_DATE), 0)
         date = datetime.datetime(*time_tuple)
         # voucherId = save_voucher(
@@ -193,23 +99,8 @@ for discount_file in discount_files:
         # save_transaction ('DISCOUNT', voucherId, null,
         #                           null,
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT))
-        voucher  = Voucher.objects.get_or_create(
-                voucher_no = sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_VOUCHER_NO),
-                client = client,
-                date = date,
-                )[0]
-        
-        transaction = Transaction.objects.get_or_create(
-                t_type = 'DISCOUNT',
-                voucher = voucher,
-                volume = 0,
-                amount = check(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT)),
-
-                )[0]
-            
-
         rowIdx += 1
-print("Ended DISCOUNT ")
+
 # read return data
 return_files = [f for f in listdir(RETURN_FILE_LOCATION) if isfile(join(RETURN_FILE_LOCATION, f))]
 
@@ -219,10 +110,6 @@ for return_file in return_files:
     sheet = workbook.sheet_by_index(RETURN_SHEET_IDX)
     rowIdx = 0
 
-
-    voucher     = None
-    client      = None
-    date        = None
     while True:
         if sheet.cell_type(rowIdx, RETURN_COLUMN_IDX_FOR_DATE) == xlrd.XL_CELL_DATE:
             break
@@ -234,11 +121,6 @@ for return_file in return_files:
         # clientId = save_client_or_return_client_id_if_exists(
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME))
         # provide random salesmanId and locationId
-        client = Client.objects.get_or_create(
-                name = sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME),
-                region = random.choice(regions),
-                salesman = random.choice(salesmans),
-            )[0]
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_DATE), 0)
         date = datetime.datetime(*time_tuple)
         # voucherId = save_voucher(
@@ -247,22 +129,4 @@ for return_file in return_files:
         # save_transaction ('RETURN', voucherId, null,
         #                           null,
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT))
-
-        voucher  = Voucher.objects.get_or_create(
-                voucher_no = sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_VOUCHER_NO),
-                client = client,
-                date = date,
-                )[0]
-        
-        transaction = Transaction.objects.get_or_create(
-                t_type = 'RETURN',
-                voucher = voucher,
-                volume = 0,
-                amount = check(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT)),
-
-                )[0]
-            
-
         rowIdx += 1
-
-print("END")

@@ -27,21 +27,19 @@ def cmp(client):
 		return dic[client]
 
 def test(request):
-	qs		= Transaction.objects.filter(product__company = request.user.profile.company)
-	return render(request, 'main/test.html', {'items': qs})
-
+	pass
 @login_required
 def index(request):
 	return render(request , 'main/index.html', {
-		'products': Product.objects.filter(company = request.user.profile.company ),
-		'clients': Client.objects.filter(company = request.user.profile.company),
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
 		'regions': Region.objects.all(),
-		'salesMans': SalesMan.objects.filter(company = request.user.profile.company)
+		'salesMans': SalesMan.objects.all()
 	})
 
 
 def product(request,*args, **kwargs):
-	product = get_object_or_404(Product.objects.filter(company = request.user.profile.company), pk =kwargs['id'])
+	product = get_object_or_404(Product.objects.all(), pk =kwargs['id'])
 	return render(request, 'main/product.html', {'product': product})
 
 
@@ -91,7 +89,7 @@ class ProductView(APIView):
 		if request.GET['endDate'] != '':
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,
+		transactions		= Transaction.objects.filter(
 			voucher__date__gte = beginDate, voucher__date__lte = endDate
 		)
 
@@ -102,7 +100,7 @@ class ProductView(APIView):
 		if request.GET['salesman'] != '':
 			transactions 	= transactions.filter(seller__id = request.GET['salesman'])
 
-		products			= Product.objects.filter(company = request.user.profile.company)
+		products			= Product.objects.all()
 		MapforVolume 	= {}
 		MapForTk		= {}
 		for p in products:
@@ -126,7 +124,7 @@ class ProductView(APIView):
 		paginator = Paginator(output, pageint	)
 		page = request.GET.get('page', 1)
 		pg = proper_paginate(paginator, int(page))
-		
+
 
 		try:
 			rows = paginator.page(page)
@@ -157,7 +155,7 @@ class ClientView(APIView):
 		if request.GET['endDate'] != '':
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,
+		transactions		= Transaction.objects.filte(
 			voucher__date__gte = beginDate, voucher__date__lte = endDate
 		)
 
@@ -168,7 +166,7 @@ class ClientView(APIView):
 		if request.GET['salesman'] != '':
 			transactions 	= transactions.filter(seller__id = request.GET['salesman'])
 
-		clients			= Client.objects.filter(company = request.user.profile.company)
+		clients			= Client.objects.all()
 		MapforVolume 	= {}
 		MapForTk		= {}
 		for c in clients:
@@ -201,7 +199,7 @@ class ClientView(APIView):
 		data = {
 			'table': render_to_string('main/includes/client-table.html', {'objects': rows, 'page-page_range': pg}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "Client-" + request.GET['queryType']})
-		
+
 		}
 		return Response(data)
 
@@ -263,8 +261,8 @@ class RegionView(APIView):
 		data = {
 			'table': render_to_string('main/includes/region-table.html', {'objects': rows, 'page-page_range': pg}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "Region-" + request.GET['queryType']})
-		
-		
+
+
 		}
 		return Response(data)
 
@@ -512,7 +510,7 @@ class PercentileSalesMan(APIView):
 	permission_classes 		= (IsAuthenticated,)
 
 	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.filter(product__company = request.user.profile.company,)
+		transactions		= Transaction.objects.all()
 		salesMans 			= SalesMan.objects.filter(company = request.user.profile.company)
 		data = {}
 
