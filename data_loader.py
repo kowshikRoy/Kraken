@@ -53,11 +53,12 @@ for sales_file in sales_files:
         if sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_INVOICE) == 'Invoice':
             # clientId = save_client_or_return_client_id_if_exists(
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME))
+            # provide random salesmanId and locationId
             time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_DATE), 0)
-            wholeDate = datetime.datetime(*time_tuple)
+            date = datetime.datetime(*time_tuple)
             # voucherId = save_voucher(
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_VOUCHER_NO),
-            #                           clientId, wholeDate.day, wholeDate.month, wholeDate.year)
+            #                           clientId, date)
         else:
             # assert that clientId and voucherId >= 0
             # productId = save_product_or_return_product_id_if_exists(
@@ -87,11 +88,12 @@ for discount_file in discount_files:
             break
         # clientId = save_client_or_return_client_id_if_exists(
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME))
+        # provide random salesmanId and locationId
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_DATE), 0)
-        wholeDate = datetime.datetime(*time_tuple)
+        date = datetime.datetime(*time_tuple)
         # voucherId = save_voucher(
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_VOUCHER_NO),
-        #                           wholeDate.day, wholeDate.month, wholeDate.year)
+        #                           clientId, date)
         # save_transaction ('DISCOUNT', voucherId, null,
         #                           null,
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT))
@@ -116,11 +118,12 @@ for return_file in return_files:
             break
         # clientId = save_client_or_return_client_id_if_exists(
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME))
+        # provide random salesmanId and locationId
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_DATE), 0)
-        wholeDate = datetime.datetime(*time_tuple)
+        date = datetime.datetime(*time_tuple)
         # voucherId = save_voucher(
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_VOUCHER_NO),
-        #                           wholeDate.day, wholeDate.month, wholeDate.year)
+        #                           clientId, date)
         # save_transaction ('RETURN', voucherId, null,
         #                           null,
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT))
