@@ -106,7 +106,7 @@
             if(e != null) salesman =e.options[e.selectedIndex].value;
 
             var info = this.id.split('-');
-            LoadTable(info[0], info[1], beginDate, endDate,product,client,region,salesman);
+            LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
       });
       $('.paging').on('click', 'a', function(e){
         e.preventDefault(); 
