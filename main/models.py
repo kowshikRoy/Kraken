@@ -11,7 +11,7 @@ class Region(models.Model):
 
 
 class Product(models.Model):
-	name 		= models.CharField(max_length = 120)
+	name 		= models.CharField(max_length = 120, unique = True)
 	def __str__(self):
 		return self.name
 
@@ -26,20 +26,13 @@ class SalesMan(models.Model):
 
 
 class Client(models.Model):
-	name 		= models.CharField(max_length = 120, blank = False, null = False)
+	name 		= models.CharField(max_length = 50, unique = True)
 	region		= models.ForeignKey(Region, on_delete = models.CASCADE)
 	salesman 	= models.ForeignKey(SalesMan, on_delete = models.CASCADE)
 	def __str__(self):
 		return self.name
 
 
-
-class Voucher(models.Model):
-	voucher_no	= models.CharField(max_length = 20)
-	client 		= models.ForeignKey(Client, on_delete = models.CASCADE, null= True)
-	date		= models.DateField()
-	def __str__(self):
-		return self.voucher_no + " " + str(self.date)
 
 
 class Transaction(models.Model):
@@ -52,8 +45,10 @@ class Transaction(models.Model):
         )
 	t_type	 	= models.CharField(max_length = 20, choices = T_TYPE, default="PRIMARY")
 	product 	= models.ForeignKey(Product, on_delete = models.CASCADE, null = True)
-	voucher 	= models.ForeignKey(Voucher ,on_delete = models.CASCADE, null= True)
+	client 		= models.ForeignKey(Client, on_delete = models.CASCADE)
+	date 		= models.DateField()
 	volume		= models.FloatField(default = 0)
 	amount		= models.FloatField(default = 0)
+	
 	def __str__(self):
-		return  str(self.voucher) + " Volume-" + str(self.volume) + " Amount-" + str(self.amount)
+		return  str(self.t_type) + " " + str(self.date) + " " + str(self.client) + " " + str(self. product)

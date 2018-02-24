@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .utils import proper_paginate, getPercentile,getData
-from .models import  Region, Product, Client, SalesMan,Transaction,Voucher
+from .models import  Region, Product, Client, SalesMan,Transaction
 
 pageint = 5
 dic = {}
@@ -122,15 +122,15 @@ class ProductView(APIView):
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
 		transactions		= Transaction.objects.filter(
-			voucher__date__gte = beginDate, voucher__date__lte = endDate
+			date__gte = beginDate, date__lte = endDate
 		)
 
 		if request.GET['client'] != '':
-			transactions	= transactions.filter(voucher__client__id = request.GET['client'])
+			transactions	= transactions.filter(client__id = request.GET['client'])
 		if request.GET['region'] != '':
-			transactions 	= transactions.filter(voucher__client__region__id = request.GET['region'])
+			transactions 	= transactions.filter(client__region__id = request.GET['region'])
 		if request.GET['salesman'] != '':
-			transactions 	= transactions.filter(voucher__client__salesman__id = request.GET['salesman'])
+			transactions 	= transactions.filter(client__salesman__id = request.GET['salesman'])
 
 		products			= Product.objects.all()
 		MapforVolume 	= {}
@@ -190,15 +190,15 @@ class ClientView(APIView):
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
 		transactions		= Transaction.objects.filter(
-			voucher__date__gte = beginDate, voucher__date__lte = endDate
+			date__gte = beginDate, date__lte = endDate
 		)
 
 		if request.GET['product'] != '':
 			transactions	= transactions.filter(product__id = request.GET['product'])
 		if request.GET['region'] != '':
-			transactions 	= transactions.filter(voucher__client__region__id = request.GET['region'])
+			transactions 	= transactions.filter(client__region__id = request.GET['region'])
 		if request.GET['salesman'] != '':
-			transactions 	= transactions.filter(voucher__client__salesman__id = request.GET['salesman'])
+			transactions 	= transactions.filter(client__salesman__id = request.GET['salesman'])
 
 		clients			= Client.objects.all()
 		MapforVolume 	= {}
@@ -208,8 +208,8 @@ class ClientView(APIView):
 			MapForTk[c.id] = 0
 
 		for i in transactions:
-			MapForTk[i.voucher.client.id] += i.amount
-			MapforVolume[i.voucher.client.id] += i.volume
+			MapForTk[i.client.id] += i.amount
+			MapforVolume[i.client.id] += i.volume
 
 
 		output 		= [(c, MapforVolume[c.id], MapForTk[c.id]) for c in clients]
@@ -252,15 +252,15 @@ class RegionView(APIView):
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
 		transactions		= Transaction.objects.filter(
-			voucher__date__gte = beginDate, voucher__date__lte = endDate
+			date__gte = beginDate, date__lte = endDate
 		)
 
 		if request.GET['product'] != '':
 			transactions	= transactions.filter(product__id = request.GET['product'])
 		if request.GET['client'] != '':
-			transactions 	= transactions.filter(voucher__client__id = request.GET['client'])
+			transactions 	= transactions.filter(client__id = request.GET['client'])
 		if request.GET['salesman'] != '':
-			transactions 	= transactions.filter(voucher__client__salesman__id = request.GET['salesman'])
+			transactions 	= transactions.filter(lient__salesman__id = request.GET['salesman'])
 
 		regions			= Region.objects.all()
 		MapforVolume 	= {}
@@ -270,8 +270,8 @@ class RegionView(APIView):
 			MapForTk[r.id] = 0
 
 		for i in transactions:
-			MapForTk[i.voucher.client.region.id] += i.amount
-			MapforVolume[i.voucher.client.region.id] += i.volume
+			MapForTk[i.client.region.id] += i.amount
+			MapforVolume[i.client.region.id] += i.volume
 
 
 		output 		= [(r, MapforVolume[r.id], MapForTk[r.id]) for r in regions]
@@ -315,15 +315,15 @@ class SalesManView(APIView):
 			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
 		transactions		= Transaction.objects.filter(
-			voucher__date__gte = beginDate, voucher__date__lte = endDate
+			date__gte = beginDate, date__lte = endDate
 		)
 
 		if request.GET['product'] != '':
 			transactions	= transactions.filter(product__id = request.GET['product'])
 		if request.GET['client'] != '':
-			transactions 	= transactions.filter(voucher__client__id = request.GET['client'])
+			transactions 	= transactions.filter(client__id = request.GET['client'])
 		if request.GET['region'] != '':
-			transactions 	= transactions.filter(voucher__client__region__id = request.GET['region'])
+			transactions 	= transactions.filter(client__region__id = request.GET['region'])
 
 		salesMans			= SalesMan.objects.all()
 		MapforVolume 	= {}
@@ -333,8 +333,8 @@ class SalesManView(APIView):
 			MapForTk[r.id] = 0
 
 		for i in transactions:
-			MapForTk[i.voucher.client.salesman.id] += i.amount
-			MapforVolume[i.voucher.client.salesman.id] += i.volume
+			MapForTk[i.client.salesman.id] += i.amount
+			MapforVolume[i.client.salesman.id] += i.volume
 
 
 		output 		= [(r, MapforVolume[r.id], MapForTk[r.id]) for r in salesMans]
@@ -408,7 +408,7 @@ class LoadProduct(APIView):
 		
 
 		for t in transactions:
-			year  = t.voucher.date.year;
+			year  = t.date.year;
 			if year in tk: tk[year] += t.amount
 			else : tk[year] = t.amount
 
@@ -418,8 +418,8 @@ class LoadProduct(APIView):
 
 
 
-			yearMin = min(yearMin, t.voucher.date.year)
-			yearMax = max(yearMax, t.voucher.date.year)
+			yearMin = min(yearMin, t.date.year)
+			yearMax = max(yearMax, t.date.year)
 
 
 		for i in range(yearMin, yearMax + 1):
@@ -437,7 +437,7 @@ class LoadProduct(APIView):
 
 		#This Year Data
 		beginDate = date.today().replace(year = date.today().year-1, day = 1)
-		transactions = transactions.filter(voucher__date__gte = beginDate)
+		transactions = transactions.filter(date__gte = beginDate)
 
 		volume = {}
 		tk = {}
@@ -453,7 +453,7 @@ class LoadProduct(APIView):
 			print(out)
 
 		for t in transactions:
-			out  = t.voucher.date.strftime('%b %y')
+			out  = t.date.strftime('%b %y')
 			tk[out] += t.amount
 			volume[out] += t.volume
 
@@ -511,7 +511,7 @@ class PercentileClient(APIView):
 			label.append(str(i)+"-"+str(i+19)+'%')
 
 		for p in clients: tk[p.id] = 0
-		for t in transactions: tk[t.voucher.client.id] += t.amount
+		for t in transactions: tk[t.client.id] += t.amount
 		output = [( p , tk[p.id]) for p in clients]
 		output = sorted(output, key = lambda x: x[1], reverse = True)
 
@@ -541,7 +541,7 @@ class PercentileRegion(APIView):
 			label.append(str(i)+"-"+str(i+19)+'%')
 
 		for r in regions: tk[r.id] = 0
-		for t in transactions: tk[t.voucher.client.region.id] += t.amount
+		for t in transactions: tk[t.client.region.id] += t.amount
 
 		output = [( p , tk[p.id]) for p in regions]
 		output = sorted(output, key = lambda x: x[1], reverse = True)
@@ -571,7 +571,7 @@ class PercentileSalesMan(APIView):
 
 		for r in salesMans: tk[r.id] = 0
 		for t in transactions: 
-			tk[t.voucher.client.salesman.id] += t.amount
+			tk[t.client.salesman.id] += t.amount
 
 		output = [( p , tk[p.id]) for p in salesMans]
 		output = sorted(output, key = lambda x: x[1], reverse = True)
@@ -691,14 +691,14 @@ class LatestClient(APIView):
 
 		query = []
 		if table == 'week':
-			query	= Transaction.objects.filter(voucher__date__gte = today - timedelta(days = 7) , voucher__date__lte = today)
+			query	= Transaction.objects.filter(date__gte = today - timedelta(days = 7) , date__lte = today)
 		elif table == 'month':
-			query	= Transaction.objects.filter(voucher__date__gte = today - timedelta(days = 30), voucher__date__lte = today)
+			query	= Transaction.objects.filter(date__gte = today - timedelta(days = 30), date__lte = today)
 		else:
-			query	= Transaction.objects.filter(voucher__date__gte = today.replace(month=1, day=1), voucher__date__lte = today)
+			query	= Transaction.objects.filter(date__gte = today.replace(month=1, day=1), date__lte = today)
 
 		for c in Client.objects.all():dic[c] = 0
-		for i in query:dic[i.voucher.client] += i.amount
+		for i in query:dic[i.client] += i.amount
 		serial 		= sorted(Client.objects.all(), key=cmp, reverse = True)
 		yearTable 	= [(i, dic[i])  for i in serial]
 		yearData	= [ dic[i] for i in serial]
@@ -735,13 +735,13 @@ class LoadDefaultClients(APIView):
 	def get(self, request, *args, **kwargs) :
 		today = date.today()
 		qs			= Transaction.objects.all()
-		qyear		= qs.filter(voucher__date__gte = today.replace(month=1, day=1), voucher__date__lte = today)
-		qmonth		= qs.filter(voucher__date__gte = today - timedelta(days = 30), voucher__date__lte = today)
+		qyear		= qs.filter(date__gte = today.replace(month=1, day=1), voucher__date__lte = today)
+		qmonth		= qs.filter(date__gte = today - timedelta(days = 30), voucher__date__lte = today)
 		qweek		= qs.filter(voucher__date__gte = today - timedelta(days = 7) , voucher__date__lte = today)
 
 
 		for c in Client.objects.all():dic[c] = 0
-		for i in qyear:dic[i.voucher.client] += i.amount
+		for i in qyear:dic[i.client] += i.amount
 		serial 		= sorted(Client.objects.all(), key=cmp, reverse = True)
 		yearTable 	= [(i, dic[i])  for i in serial]
 		yearData	= [ dic[i] for i in serial]
@@ -759,7 +759,7 @@ class LoadDefaultClients(APIView):
 
 
 		for c in Client.objects.all():dic[c] = 0
-		for i in qweek:dic[i.voucher.client] += i.amount
+		for i in qweek:dic[i.client] += i.amount
 		serial 		= sorted(Client.objects.all(), key=cmp, reverse = True)
 		weekTable 	= [(i, dic[i])  for i in serial]
 		weekData	= [ dic[i] for i in serial]
@@ -777,7 +777,7 @@ class LoadDefaultClients(APIView):
 
 
 		for c in Client.objects.all():dic[c] = 0
-		for i in qmonth:dic[i.voucher.client] += i.amount
+		for i in qmonth:dic[i.client] += i.amount
 		serial 		= sorted(Client.objects.all(), key=cmp, reverse = True)
 		monthTable 	= [(i, dic[i])  for i in serial]
 		monthData	= [ dic[i] for i in serial]

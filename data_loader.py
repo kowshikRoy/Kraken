@@ -11,7 +11,7 @@ django.setup()
 import time
 from datetime import date
 from django.contrib.auth.models import User
-from main.models import Region, Client,Product,SalesMan,Voucher,Transaction
+from main.models import Region, Client,Product,SalesMan,Transaction
 usernames = ['John', 'Zubaer', 'Repon']
 region_names = ['Dhaka','Chittagong', 'Khulna', 'Rajshahi','Barisal','Sylhet','Rangpur','Commilla']
 person_name = ['Ahnaf', 'Shamim', 'Sabbir','Rafi', 'Anik', 'Fardin','Sumon','Rubel','Mahir','Saiful']
@@ -26,7 +26,6 @@ for i in range(len(usernames)):
 for i in range(len(person_name)):
     name        = person_name[i]
     salesman    = SalesMan.objects.get_or_create(name = name)[0]
-    print(salesman)
 
 
 for i in range(len(region_names)):
@@ -37,12 +36,18 @@ user = User.objects.get(username = 'John') #User Account
 salesmans = SalesMan.objects.all()
 regions = Region.objects.all()
 Client.objects.all().delete()
-Voucher.objects.all().delete()
 Product.objects.all().delete()
 Transaction.objects.all().delete()
 
 
+dic= {}
+ProductDic = {}
+VoucherDic = {}
 
+clients = list()
+vouchers = list()
+products = list()
+transactions = list()
 def check(s):
     if(s==''): return '0'
     return s 
@@ -93,7 +98,6 @@ for sales_file in sales_files:
     voucherId = -1
     clientId = -1
 
-    voucher     = None
     client      = None
     date        = None
 
@@ -102,7 +106,7 @@ for sales_file in sales_files:
             break
         startRow += 1
 
-    for rowIdx in range(startRow, min(20,sheet.nrows)):
+    for rowIdx in range(startRow, sheet.nrows):
         if sheet.cell_value(rowIdx, 0) == '':
             break
 
@@ -112,11 +116,16 @@ for sales_file in sales_files:
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME))
             # provide random salesmanId and locationId
 
-            client = Client.objects.get_or_create(
+            name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME)
+            if(name in dic) :
+                client = dic[name]
+            else :
+                client =  Client(
                 name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME),
                 region = random.choice(regions),
-                salesman = random.choice(salesmans),
-            )[0]
+                salesman = random.choice(salesmans),)
+                dic[name] = client
+                clients.append(client)
 
 
             time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_DATE), 0)
@@ -124,12 +133,6 @@ for sales_file in sales_files:
             # voucherId = save_voucher(
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_VOUCHER_NO),
             #                           clientId, date)
-
-            voucher  = Voucher.objects.get_or_create(
-                voucher_no = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_VOUCHER_NO),
-                client = client,
-                date = date,
-                )[0]
             
         else:
             # assert that clientId and voucherId >= 0
@@ -139,22 +142,33 @@ for sales_file in sales_files:
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)
             #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))
 
-            product = Product.objects.get_or_create(
+            name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_NAME)
+            if name in ProductDic:
+                product = ProductDic[name]
+            else:
+                product = Product(
                     name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_NAME),
-                )[0]
-            #print(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))
-            transaction = Transaction.objects.get_or_create(
-                t_type = 'PURCHASE',
-                product = product,
-                voucher = voucher,
-                volume = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)),
-                amount = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE)),
+                )
+                ProductDic[name] = product
+                products.append(product)
 
-                )[0]
+            # #print(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))
+
+            transaction = Transaction(
+                t_type  = 'PURCHASE',
+                product = product,
+                client  = client,
+                date    = date,
+                volume  = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)),
+                amount  = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE)),
+
+                )
+            transactions.append(transaction)
             
         rowIdx += 1
 
 print("Ended Sales ")
+
 
 
 # read discount data
@@ -177,39 +191,54 @@ for discount_file in discount_files:
     while True:
         if sheet.cell_type(rowIdx, DISCOUNT_COLUMN_IDX_FOR_DATE) != xlrd.XL_CELL_DATE:
             break
+
         # clientId = save_client_or_return_client_id_if_exists(
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME))
         # provide random salesmanId and locationId
-        client = Client.objects.get_or_create(
+
+        name = sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME)
+        if name in dic :
+            client = dic[name]
+        else :
+            client = Client(
                 name = sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_CLIENT_NAME),
                 region = random.choice(regions),
                 salesman = random.choice(salesmans),
-            )[0]
+            )
+            clients.append(client)
+            dic[name] = client
+
+
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_DATE), 0)
         date = datetime.datetime(*time_tuple)
+        print(date)
         # voucherId = save_voucher(
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_VOUCHER_NO),
         #                           clientId, date)
         # save_transaction ('DISCOUNT', voucherId, null,
         #                           null,
         #                           sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT))
-        voucher  = Voucher.objects.get_or_create(
-                voucher_no = sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_VOUCHER_NO),
-                client = client,
-                date = date,
-                )[0]
+       
         
-        transaction = Transaction.objects.get_or_create(
-                t_type = 'DISCOUNT',
-                voucher = voucher,
-                volume = 0,
-                amount = check(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT)),
+        transaction = Transaction(
+                t_type  = 'DISCOUNT',
+                product = None,
+                client  = client,
+                date    = date,
+                volume  = 0,
+                amount  = check(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT)),
 
-                )[0]
+                )
+        transactions.append(transaction)
             
 
         rowIdx += 1
 print("Ended DISCOUNT ")
+
+
+
+
+
 # read return data
 return_files = [f for f in listdir(RETURN_FILE_LOCATION) if isfile(join(RETURN_FILE_LOCATION, f))]
 
@@ -220,7 +249,7 @@ for return_file in return_files:
     rowIdx = 0
 
 
-    voucher     = None
+    
     client      = None
     date        = None
     while True:
@@ -234,13 +263,22 @@ for return_file in return_files:
         # clientId = save_client_or_return_client_id_if_exists(
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME))
         # provide random salesmanId and locationId
-        client = Client.objects.get_or_create(
+
+        name = sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME)
+        if name in dic : 
+            client = dic[name]
+        else: 
+            client = Client(
                 name = sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME),
                 region = random.choice(regions),
                 salesman = random.choice(salesmans),
-            )[0]
+            )
+            clients.append(client)
+            dic[name] = client
+
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_DATE), 0)
         date = datetime.datetime(*time_tuple)
+        print(date)
         # voucherId = save_voucher(
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_VOUCHER_NO),
         #                           clientId, date)
@@ -248,21 +286,46 @@ for return_file in return_files:
         #                           null,
         #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT))
 
-        voucher  = Voucher.objects.get_or_create(
-                voucher_no = sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_VOUCHER_NO),
-                client = client,
-                date = date,
-                )[0]
         
-        transaction = Transaction.objects.get_or_create(
+        
+        transaction = Transaction(
                 t_type = 'RETURN',
-                voucher = voucher,
+                product = None,
+                client = client,
+                date    =date,
                 volume = 0,
                 amount = check(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT)),
 
-                )[0]
-            
+                )
+        
+        transactions.append(transaction)
 
         rowIdx += 1
 
 print("END")
+
+
+Client.objects.bulk_create(clients)
+Product.objects.bulk_create(products)
+Dict_Client = {}
+Dict_Product= {}
+for x in Client.objects.all():
+    Dict_Client[x.name] = x
+
+for x in Product.objects.all():
+    Dict_Product[x.name] = x;
+
+for x in transactions:
+    if(x is None):
+        continue
+    if x.product != None:
+        x.product = Dict_Product[x.product.name]
+    x.client = Dict_Client[x.client.name]
+   
+    # if x.product != None:
+    #     x.product = Dict_Product[x.product.name]
+    # x.client = Dict_Client[x.client.name]
+
+print("Key Resolved")
+Transaction.objects.bulk_create(transactions)
+print("ALl END")
