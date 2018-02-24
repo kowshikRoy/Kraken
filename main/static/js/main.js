@@ -142,3 +142,16 @@ function LoadPrediction(modelName, queryId) {
  } ,
 });
 }
+
+function LoadPercentlie(modelName) {
+    $.ajax({
+      method      :"GET",
+      url         :'/api/percentile/',
+      data        : {
+        'modelName' : modelName.toUpperCase()
+      },
+      success: function(data){
+        drawOneChart(document.getElementById('percentile-'+modelName),'bar', data)
+      } ,
+    });
+  }

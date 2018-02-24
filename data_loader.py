@@ -10,11 +10,34 @@ django.setup()
 
 import time
 from datetime import date
+from main.utils import upd, getPercentile
 from django.contrib.auth.models import User
-from main.models import Region, Client,Product,SalesMan,Transaction
+from main.models import Region, Client,Product,SalesMan,Transaction,PercentileInfo
+
+# deleting Existing Instances.
+salesmans = SalesMan.objects.all().delete()
+regions = Region.objects.all().delete()
+Client.objects.all().delete()
+Product.objects.all().delete()
+Transaction.objects.all().delete()
+PercentileInfo.objects.all().delete()
+#--------------------------------------------
+
+
+
+# Creating Username, Regions and Salesmen
 usernames = ['John', 'Zubaer', 'Repon']
 region_names = ['Dhaka','Chittagong', 'Khulna', 'Rajshahi','Barisal','Sylhet','Rangpur','Commilla']
 person_name = ['Ahnaf', 'Shamim', 'Sabbir','Rafi', 'Anik', 'Fardin','Sumon','Rubel','Mahir','Saiful']
+
+# Stores unsaved instans
+regions = list()
+salesmans = list()
+clients = list()
+products = list()
+transactions = list()
+
+
 
 
 for i in range(len(usernames)):
@@ -25,29 +48,26 @@ for i in range(len(usernames)):
 
 for i in range(len(person_name)):
     name        = person_name[i]
-    salesman    = SalesMan.objects.get_or_create(name = name)[0]
+    salesman    = SalesMan(name = name)
+    salesmans.append(salesman)
 
 
 for i in range(len(region_names)):
     inp         = region_names[i]
-    region      = Region.objects.get_or_create(name = inp)[0]
+    region      = Region(name = inp)
+    regions.append(region)
+
+
 
 user = User.objects.get(username = 'John') #User Account
-salesmans = SalesMan.objects.all()
-regions = Region.objects.all()
-Client.objects.all().delete()
-Product.objects.all().delete()
-Transaction.objects.all().delete()
+
+
+
 
 
 dic= {}
 ProductDic = {}
-VoucherDic = {}
 
-clients = list()
-vouchers = list()
-products = list()
-transactions = list()
 def check(s):
     if(s==''): return '0'
     return s 
@@ -159,8 +179,8 @@ for sales_file in sales_files:
                 product = product,
                 client  = client,
                 date    = date,
-                volume  = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)),
-                amount  = check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE)),
+                volume  = float(check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT))),
+                amount  = float(check(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))),
 
                 )
             transactions.append(transaction)
@@ -226,7 +246,8 @@ for discount_file in discount_files:
                 client  = client,
                 date    = date,
                 volume  = 0,
-                amount  = check(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT)),
+                amount  = float(
+                    check(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT))),
 
                 )
         transactions.append(transaction)
@@ -294,7 +315,8 @@ for return_file in return_files:
                 client = client,
                 date    =date,
                 volume = 0,
-                amount = check(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT)),
+                amount = float(
+                    check(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT))),
 
                 )
         
@@ -304,9 +326,90 @@ for return_file in return_files:
 
 print("END")
 
+c_amount = {}
+p_amount = {}
+r_amount = {}
+s_amount = {}
+
+c_volume = {}
+p_volume = {}
+r_volume = {}
+s_volume = {}
+
+# for p in products: 
+#     p_amount[p.name] = 0 
+#     p_volume[p.name]= 0
+
+# for p in clients: 
+#     c_amount[p.name] = 0 
+#     c_volume[p.name]= 0
+
+# for p in regions: 
+#     r_amount[p.name] = 0 
+#     r_volume[p.name]= 0
+
+# for p in salesmans: 
+#     s_amount[p.name] = 0 
+#     s_volume[p.name]= 0
+
+
+
+for x in transactions:
+    if x is None: continue
+    if x.product != None:
+        upd(p_amount, x.product.name, x.amount)
+        upd(p_volume, x.product.name, x.volume)
+    upd(c_amount, x.client.name, x.amount)
+    upd(c_volume, x.client.name, x.volume)
+
+for c in clients:
+    c.amount = c_amount[c.name]
+    c.volume = c_volume[c.name]
+
+    upd(r_amount, c.region.name, c.amount)
+    upd(r_volume, c.region.name, c.volume)
+
+    upd(s_amount, c.salesman.name, c.amount)
+    upd(s_volume, c.salesman.name, c.volume)
+
+
+
+for p in products:
+    p.amount = p_amount[p.name]
+    p.volume = p_volume[p.name]
+
+for r in regions:
+    r.amount = r_amount[r.name]
+    r.volume = r_volume[r.name]
+
+for s  in salesmans:
+    s.amount = s_amount[s.name]
+    s.volume = s_volume[s.name]
+
+Region.objects.bulk_create(regions)
+SalesMan.objects.bulk_create(salesmans)
+Product.objects.bulk_create(products)
+
+
+Dict_Region = {}
+Dict_Salesman = {}
+regions = Region.objects.all()
+salesmans = SalesMan.objects.all()
+
+
+for r in regions:   Dict_Region[r.name] = r 
+for s in salesmans: Dict_Salesman[s.name] = s 
+
+for c in clients: 
+    c.region = Dict_Region[c.region.name]
+    c.salesman = Dict_Salesman[c.salesman.name]
+
 
 Client.objects.bulk_create(clients)
-Product.objects.bulk_create(products)
+
+
+print("Created Tables except Transaction")
+
 Dict_Client = {}
 Dict_Product= {}
 for x in Client.objects.all():
@@ -328,4 +431,57 @@ for x in transactions:
 
 print("Key Resolved")
 Transaction.objects.bulk_create(transactions)
-print("ALl END")
+
+
+print("Percentile Loading")
+
+amounts_c = [ x.amount for x in clients]
+amounts_p = [ x.amount for x in products]
+amounts_r = [ x.amount for x in regions]
+amounts_s = [ x.amount for x in salesmans]
+
+parts = 5
+out =  getPercentile(amounts_c, parts)
+for i in range(parts):
+    p = PercentileInfo.objects.get_or_create(
+        p_type = 'CLIENT',
+        number = i + 1, 
+        amount = out[i], )[0]
+    print(p.number, p.amount)
+
+
+out =  getPercentile(amounts_p, parts)
+for i in range(parts):
+    p = PercentileInfo.objects.get_or_create(
+        p_type = 'PRODUCT',
+        number = i + 1, 
+        amount = out[i], )[0]
+    print(p.number, p.amount)
+
+
+out =  getPercentile(amounts_r, parts)
+for i in range(parts):
+    p = PercentileInfo.objects.get_or_create(
+        p_type = 'REGION',
+        number = i + 1, 
+        amount = out[i], )[0]
+    print(p.number, p.amount)
+
+
+out =  getPercentile(amounts_s, parts)
+for i in range(parts):
+    p = PercentileInfo.objects.get_or_create(
+        p_type = 'SALESMAN',
+        number = i + 1, 
+        amount = out[i], )[0]
+    print(p.number, p.amount)
+
+
+
+
+
+
+
+
+
+

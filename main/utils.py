@@ -22,6 +22,7 @@ def proper_paginate(paginator, current_page, neighbors=2):
 
 
 def getPercentile(obj, parts):
+    obj = sorted(obj, reverse = True)
     n = len(obj)
     l = [int(n / parts)] * parts
     for i in range(n % parts):
@@ -37,7 +38,7 @@ def getPercentile(obj, parts):
     for i in range(len(obj)):
         if (i == stamps[ptr]):
             ptr += 1
-        out[ptr] += obj[i][1]
+        out[ptr] += obj[i]
 
     return out
 
@@ -59,6 +60,13 @@ def getData(request, output, paging, page, template, ):
                                       {'page': rows, 'page_range': pg, 'id': "Product-" + request.GET['queryType']})
     }
     return data
+
+def upd(Dic, name, v):
+    if name in Dic:
+        Dic[name] += v
+    else:
+        Dic[name] = v 
+
 
 
 def getPredictedSale(data):

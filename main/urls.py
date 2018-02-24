@@ -40,11 +40,7 @@ from .views import (
     region,
     salesman,
     LoadProduct,
-    PercentileProduct,
-    PercentileClient,
-    PercentileRegion,
-    PercentileSalesMan
-
+    Percentile,
 
 )
 urlpatterns = [
@@ -66,10 +62,8 @@ urlpatterns = [
     url(r'^api/Region/$', RegionView.as_view()),
     url(r'^api/SalesMan/$', SalesManView.as_view()),
     url(r'^api/LoadProduct/$', LoadProduct.as_view()),
-    url(r'^api/percentile/product/$', PercentileProduct.as_view()),
-    url(r'^api/percentile/client/$', PercentileClient.as_view()),
-    url(r'^api/percentile/region/$', PercentileRegion.as_view()),
-    url(r'^api/percentile/salesman/$', PercentileSalesMan.as_view()),
+    url(r'^api/percentile/$', Percentile.as_view()),
+    
 
 
 

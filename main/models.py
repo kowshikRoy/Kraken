@@ -6,12 +6,16 @@ class Region(models.Model):
 	name 		= models.CharField(max_length = 120)
 	latitude	= models.DecimalField(max_digits=9, decimal_places=6, default = 23.777176)
 	longitude	= models.DecimalField(max_digits=9, decimal_places=6, default = 90.399452)
+	volume		= models.FloatField(default = 0)
+	amount 		= models.FloatField(default = 0)
 	def __str__(self):
 		return self.name
 
 
 class Product(models.Model):
 	name 		= models.CharField(max_length = 120, unique = True)
+	volume		= models.FloatField(default = 0)
+	amount 		= models.FloatField(default = 0)
 	def __str__(self):
 		return self.name
 
@@ -21,6 +25,8 @@ class Product(models.Model):
 
 class SalesMan(models.Model):
 	name		= models.CharField(max_length = 120)
+	volume		= models.FloatField(default = 0)
+	amount 		= models.FloatField(default = 0)
 	def __str__(self):
 		return self.name
 
@@ -29,6 +35,8 @@ class Client(models.Model):
 	name 		= models.CharField(max_length = 50, unique = True)
 	region		= models.ForeignKey(Region, on_delete = models.CASCADE)
 	salesman 	= models.ForeignKey(SalesMan, on_delete = models.CASCADE)
+	volume		= models.FloatField(default = 0)
+	amount 		= models.FloatField(default = 0)
 	def __str__(self):
 		return self.name
 
@@ -52,3 +60,20 @@ class Transaction(models.Model):
 	
 	def __str__(self):
 		return  str(self.t_type) + " " + str(self.date) + " " + str(self.client) + " " + str(self. product)
+
+
+class PercentileInfo(models.Model):
+	T_TYPE 		= (
+            ('PRODUCT', 'PRODUCT'),
+            ('CLIENT', 'CLIENT'),
+            ('REGION', 'REGION'),
+            ('SALESMAN', 'SALESMAN'),
+
+        )
+	p_type	 	= models.CharField(max_length = 20, choices = T_TYPE, default="PRIMARY")
+	number		= models.IntegerField(default = 0)
+	amount		= models.IntegerField(default = 0)
+
+	def __str__(self):
+		return str(self.number) + " " + self.p_type + "= " + str(self.amount)
+	

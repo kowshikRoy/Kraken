@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .utils import proper_paginate, getPercentile,getData
-from .models import  Region, Product, Client, SalesMan,Transaction
+from .models import  Region, Product, Client, SalesMan,Transaction,PercentileInfo
 
 pageint = 5
 dic = {}
@@ -101,8 +101,6 @@ def predict(request, *args, **kwargs):
 		year  = t.voucher.date.year;
 		tk[year] += t.amount
 		volume[year] += t.volume
-
-
 
 
 
@@ -465,122 +463,18 @@ class LoadProduct(APIView):
 
 		return Response(data)
 
-class PercentileProduct(APIView):
+class Percentile(APIView):
 	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
 	permission_classes 		= (IsAuthenticated,)
-
 	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.all()
-		products			= Product.objects.all()
-
-
-		tk = {}
+		p_type = request.GET['modelName']
+		qs = PercentileInfo.objects.filter(p_type = p_type).order_by('number')
 		label = []
-
-		for i in range(1,100,20):
-			label.append(str(i)+"-"+str(i+19)+'%')
-		for p in products: tk[p.id] = 0
-		for t in transactions: 
-			if(t.t_type != 'PURCHASE'): continue
-			tk[t.product.id] += t.amount
-		output = [( p , tk[p.id]) for p in products]
-		output = sorted(output, key = lambda x: x[1], reverse = True)
-
-
+		for i in range(1,100,20): label.append(str(i)+"-"+str(i+19)+'%')
 		data = {
 			'label' : label,
-			'data'	: getPercentile(output, 5),
+			'data'	: [x.amount for x in qs]
 		}
-
-		return Response(data)
-
-
-class PercentileClient(APIView):
-	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
-	permission_classes 		= (IsAuthenticated,)
-
-	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.all()
-		clients				= Client.objects.all()
-
-
-		tk = {}
-		label = []
-
-		for i in range(1,100,20):
-			label.append(str(i)+"-"+str(i+19)+'%')
-
-		for p in clients: tk[p.id] = 0
-		for t in transactions: tk[t.client.id] += t.amount
-		output = [( p , tk[p.id]) for p in clients]
-		output = sorted(output, key = lambda x: x[1], reverse = True)
-
-		data = {
-			'label' : label,
-			'data'	: getPercentile(output, 5),
-		}
-
-		print(label)
-
-
-		return Response(data)
-
-class PercentileRegion(APIView):
-	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
-	permission_classes 		= (IsAuthenticated,)
-
-	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.all()
-		regions 			= Region.objects.all()
-		data = {}
-
-		tk = {}
-		label = []
-
-		for i in range(1,100,20):
-			label.append(str(i)+"-"+str(i+19)+'%')
-
-		for r in regions: tk[r.id] = 0
-		for t in transactions: tk[t.client.region.id] += t.amount
-
-		output = [( p , tk[p.id]) for p in regions]
-		output = sorted(output, key = lambda x: x[1], reverse = True)
-
-		data = {
-			'label' : label,
-			'data'	: getPercentile(output, 5),
-		}
-		return Response(data)
-
-
-
-class PercentileSalesMan(APIView):
-	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
-	permission_classes 		= (IsAuthenticated,)
-
-	def get(self, request, *args, **kwargs) :
-		transactions		= Transaction.objects.all()
-		salesMans 			= SalesMan.objects.all()
-		data = {}
-
-		tk = {}
-		label = []
-
-		for i in range(1,100,20):
-			label.append(str(i)+"-"+str(i+19)+'%')
-
-		for r in salesMans: tk[r.id] = 0
-		for t in transactions: 
-			tk[t.client.salesman.id] += t.amount
-
-		output = [( p , tk[p.id]) for p in salesMans]
-		output = sorted(output, key = lambda x: x[1], reverse = True)
-
-		data = {
-			'label' : label,
-			'data'	: getPercentile(output, 5),
-		}
-
 		return Response(data)
 
 
