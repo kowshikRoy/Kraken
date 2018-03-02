@@ -7,6 +7,8 @@
       	<div class="container-fluid">
                  
       		       {% include 'main/includes/tableView.html' with  heading="Product" %}
+                 {% include 'main/includes/chart.html'     with  id="productOnly" heading="Product This Year" %}
+                 {% include 'main/includes/chart.html'     with  id="productTime" heading="Product Behavior" %}
                  {% include 'main/includes/chart.html'     with  id="percentile-product" heading="Product Percentile" %}
                   
           </div>
@@ -36,10 +38,13 @@
             });
       }
 
+
       $(function() {
             LoadProduct();
-            LoadTable("Product", "volume");
-            LoadTable("Product", 'tk');
+            LoadDefault("Product","volume" ,1);
+            LoadDefault("Product","tk" ,1);
+            // LoadTable("Product", "volume");
+            // LoadTable("Product", 'tk');
 
             LoadPercentlie("product");
             
@@ -67,7 +72,9 @@
             LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
       });
       $('.paging').on('click', 'a', function(e){
+        
         e.preventDefault(); 
+      
         var info = $(this).attr('href').split('-');
         var id  = info[0] + "-" + info[1] + '-choose';
         
@@ -76,6 +83,8 @@
         var endDate = document.getElementById(id + "-endDate").value;
         var e = document.getElementById(id + "-product");
         var product = '', client = '', region= '', salesman = '';
+
+        var flag = 0;
 
         if(e!= null) product = e.options[e.selectedIndex].value;
 
@@ -88,7 +97,13 @@
         e = document.getElementById(id + "-salesman");
         if(e != null) salesman =e.options[e.selectedIndex].value;
 
-        LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
+        if(beginDate == '' && endDate == '' && 
+          product == '' && client == '' &&
+          region =='' && salesman == '') {
+          console.log(info[0]);
+          LoadDefault(info[0], info[1], info[2]);
+        }
+        else LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
       }); 
 
 </script>

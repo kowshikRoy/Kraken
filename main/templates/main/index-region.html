@@ -39,10 +39,8 @@
       
 
       $(function() {
-            
-            LoadTable("Region", "volume");
-            LoadTable("Region", 'tk');
-
+            LoadDefault("Region","volume",1);
+            LoadDefault("Region","tk",1);
             LoadPercentlie("region");
             
       });
@@ -69,7 +67,9 @@
             LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
       });
       $('.paging').on('click', 'a', function(e){
+        
         e.preventDefault(); 
+      
         var info = $(this).attr('href').split('-');
         var id  = info[0] + "-" + info[1] + '-choose';
         
@@ -78,6 +78,8 @@
         var endDate = document.getElementById(id + "-endDate").value;
         var e = document.getElementById(id + "-product");
         var product = '', client = '', region= '', salesman = '';
+
+        var flag = 0;
 
         if(e!= null) product = e.options[e.selectedIndex].value;
 
@@ -90,7 +92,13 @@
         e = document.getElementById(id + "-salesman");
         if(e != null) salesman =e.options[e.selectedIndex].value;
 
-        LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
+        if(beginDate == '' && endDate == '' && 
+          product == '' && client == '' &&
+          region =='' && salesman == '') {
+          console.log(info[0]);
+          LoadDefault(info[0], info[1], info[2]);
+        }
+        else LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
       }); 
 
 </script>

@@ -2,6 +2,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 
 
+from .models import  Region, Product, Client, SalesMan,Transaction,PercentileInfo
+
+
 def proper_paginate(paginator, current_page, neighbors=2):
     if paginator.num_pages > 2 * neighbors:
         start_index = max(1, current_page - neighbors)
@@ -69,6 +72,9 @@ def upd(Dic, name, v):
 
 
 
+
+
+
 def getPredictedSale(data):
     if len(data) > 0:
         return data[len(data) - 1][1]
@@ -78,3 +84,11 @@ def getPredictedSale(data):
 
 data = [(1, 2), (2, 3)]
 print(getPredictedSale(data))
+
+
+
+def ResolveModel(name):
+    if name =='Product': return Product
+    if name == 'Client': return Client
+    if name == 'Region': return Region
+    if name == 'SalesMan': return SalesMan

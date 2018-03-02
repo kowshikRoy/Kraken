@@ -41,6 +41,8 @@ from .views import (
     salesman,
     LoadProduct,
     Percentile,
+    DefaultView,
+    CompareView,
 
 )
 urlpatterns = [
@@ -57,21 +59,14 @@ urlpatterns = [
     url(r'^r/(?P<id>[0-9]+)/$', region, name= 'region'),
     url(r'^s/(?P<id>[0-9]+)/$', salesman, name= 'salesman'),
     url(r'^cients/$', clients, name = "clientsView"),
+    url(r'^api/default/$', DefaultView.as_view()),
+    url(r'^api/compare/$', CompareView.as_view()),
     url(r'^api/Product/$', ProductView.as_view()),
     url(r'^api/Client/$', ClientView.as_view()),
     url(r'^api/Region/$', RegionView.as_view()),
     url(r'^api/SalesMan/$', SalesManView.as_view()),
     url(r'^api/LoadProduct/$', LoadProduct.as_view()),
     url(r'^api/percentile/$', Percentile.as_view()),
-    
-
-
-
-
-
-
-
-
     url(r'^api/transaction/$', LatestPurchase.as_view()),
     # url(r'^api/Lransaction/(?P<page>[0-9]+)/$', LatestPurchase.as_view()),
     # url(r'^api/check/$', Check.as_view()),

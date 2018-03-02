@@ -33,8 +33,8 @@ class SalesMan(models.Model):
 
 class Client(models.Model):
 	name 		= models.CharField(max_length = 50, unique = True)
-	region		= models.ForeignKey(Region, on_delete = models.CASCADE)
-	salesman 	= models.ForeignKey(SalesMan, on_delete = models.CASCADE)
+	region		= models.ForeignKey(Region, on_delete = models.CASCADE, related_name= "clients")
+	salesman 	= models.ForeignKey(SalesMan, on_delete = models.CASCADE, related_name= "clients")
 	volume		= models.FloatField(default = 0)
 	amount 		= models.FloatField(default = 0)
 	def __str__(self):
@@ -52,8 +52,8 @@ class Transaction(models.Model):
 
         )
 	t_type	 	= models.CharField(max_length = 20, choices = T_TYPE, default="PRIMARY")
-	product 	= models.ForeignKey(Product, on_delete = models.CASCADE, null = True)
-	client 		= models.ForeignKey(Client, on_delete = models.CASCADE)
+	product 	= models.ForeignKey(Product, on_delete = models.CASCADE, null = True, related_name ="transactions")
+	client 		= models.ForeignKey(Client, on_delete = models.CASCADE, related_name = "transactions")
 	date 		= models.DateField()
 	volume		= models.FloatField(default = 0)
 	amount		= models.FloatField(default = 0)

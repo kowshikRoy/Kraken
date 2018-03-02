@@ -15,11 +15,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .utils import proper_paginate, getPercentile,getData
+from .utils import proper_paginate, getPercentile,getData,ResolveModel
 from .models import  Region, Product, Client, SalesMan,Transaction,PercentileInfo
 
 pageint = 5
-dic = {}
 serial = []
 pairs = []
 
@@ -70,6 +69,12 @@ def salesmanIndex(request):
 		'salesMans': SalesMan.objects.all()
 	})
 
+
+# @api_view
+# def DefaultIndex(request):
+# 	model 	= ResolveModel(request.GET['modelName'])
+	
+
 def product(request,*args, **kwargs):
 	product = get_object_or_404(Product.objects.all(), pk =kwargs['id'])
 	return render(request, 'main/product.html', {'product': product})
@@ -101,6 +106,118 @@ def predict(request, *args, **kwargs):
 		year  = t.voucher.date.year;
 		tk[year] += t.amount
 		volume[year] += t.volume
+
+
+class DefaultView(APIView):
+	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
+	permission_classes 		= (IsAuthenticated,)
+
+	def get(self, request, *args, **kwargs) :
+		model = ResolveModel(request.GET['modelName'])
+		
+		if request.GET['queryType'] == 'volume': 
+			q = model.objects.order_by('-volume')
+		else: 
+			q = model.objects.order_by('-amount')
+		output = [(x, x.volume, x.amount) for x in q]
+		
+		t_html = 'main/includes/' + request.GET['modelName'] + '-table.html'
+
+
+
+		# return Response(getData(request, output, 10, request.GET.get('page', 1), 'main/includes/product-table.html'))
+		paginator = Paginator(output, pageint	)
+		page = request.GET.get('page', 1)
+		pg = proper_paginate(paginator, int(page))
+
+
+		try:
+			rows = paginator.page(page)
+		except PageNotAnInteger:
+			rows = paginator.page(1)
+		except EmptyPage:
+			rows = paginator.page(paginator.num_pages)
+
+		data = {
+			'table': render_to_string(t_html, {'objects': rows, 'page-page_range': pg}),
+			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': request.GET['modelName'] + "-" + request.GET['queryType']})
+		}
+		return Response(data)
+
+
+class CompareView(APIView):
+	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
+	permission_classes 		= (IsAuthenticated,)
+
+	def get(self, request, *args, **kwargs) :
+		# TO DO
+		print(request.GET)
+		low = date.today()
+		high= low.replace(year = 1990)
+
+		ob1 = Transaction.objects.filter(client__salesman__id = request.GET['p1'])
+		ob2 = Transaction.objects.filter(client__salesman__id = request.GET['p2'])
+
+		option = request.GET['queryType']
+		dic = {}
+		dic2 = {}
+		for t in ob1:
+			out = t.date.strftime('%b %y')
+			if option == 'volume' : add = t.volume
+			else: add = t.amount
+
+
+			if out in dic:dic[out] +=  add
+			else : dic[out] = add
+
+			low = min(low , t.date)
+			high=max(high, t.date)
+
+		for t in ob2:
+			out = t.date.strftime('%b %y')
+			if option == 'volume' : add = t.volume
+			else: add = t.amount
+
+
+			if out in dic2: dic2[out] +=  add
+			else :dic2[out] = add
+
+			low = min(low , t.date)
+			high=max(high, t.date)
+
+		low = low.replace(day = 1)
+		high = (high + timedelta(days = 32)).replace(day = 1)
+		label = []
+		ret1 = []
+		ret2 = []
+
+		
+		while low < high:
+			out = low.strftime('%b %y')
+			label.append(out)
+			if out in dic: 
+				ret1.append(dic[out])
+			else: 
+				ret1.append(0)
+
+			if out in dic2:
+				ret2.append(dic2[out])
+			else:
+				ret2.append(0)
+
+			low = (low+timedelta(days=32)).replace(day = 1)
+
+		data = {
+			'volume' : ret1,
+			'tk': ret2,
+			'label' : label,
+		}
+		return Response(data)
+
+
+
+
+
 
 
 
@@ -167,7 +284,7 @@ class ProductView(APIView):
 
 
 		data = {
-			'table': render_to_string('main/includes/product-table.html', {'transaction': rows, 'page-page_range': pg}),
+			'table': render_to_string('main/includes/Product-table.html', {'objects': rows, 'page-page_range': pg}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "Product-" + request.GET['queryType']})
 		}
 		return Response(data)
@@ -229,7 +346,7 @@ class ClientView(APIView):
 
 
 		data = {
-			'table': render_to_string('main/includes/client-table.html', {'objects': rows, 'page-page_range': pg}),
+			'table': render_to_string('main/includes/Client-table.html', {'objects': rows, 'page-page_range': pg}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "Client-" + request.GET['queryType']})
 
 		}
@@ -291,7 +408,7 @@ class RegionView(APIView):
 
 
 		data = {
-			'table': render_to_string('main/includes/region-table.html', {'objects': rows, 'page-page_range': pg}),
+			'table': render_to_string('main/includes/Region-table.html', {'objects': rows, 'page-page_range': pg}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "Region-" + request.GET['queryType']})
 
 
@@ -355,7 +472,7 @@ class SalesManView(APIView):
 
 
 		data = {
-			'table': render_to_string('main/includes/salesman-table.html', {'objects': rows, 'page-page_range': pg}),
+			'table': render_to_string('main/includes/SalesMan-table.html', {'objects': rows, 'page-page_range': pg}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "SalesMan-" + request.GET['queryType']})
 		}
 		return Response(data)
@@ -372,30 +489,6 @@ class LoadProduct(APIView):
 		data = {}
 		yearMin = date.today().year
 		yearMax = date.today().year
-
-		# Season Data
-		# volume = {}
-		# tk = {}
-		# label = []
-
-		# for i in range(1,13):
-		# 	label.append(date(2012,i,1).strftime('%b'))
-		# 	volume[i] = 0
-		# 	tk[i] = 0
-
-		# for t in transactions:
-		# 	mon = t.voucher.date.month;
-		# 	tk[mon] += t.amount
-		# 	volume[mon] += t.volume
-		# 	yearMin = min(yearMin, t.voucher.date.year)
-		# 	yearMax = max(yearMax, t.voucher.date.year)
-
-		# data['season'] = {
-		# 	'label'		: label,
-		# 	'volume' 	: [volume[i] for i in range(1, 13)],
-		# 	'tk'		: [tk[i] for i in range(1,13)]
-		# }
-
 
 		#Year Data
 
