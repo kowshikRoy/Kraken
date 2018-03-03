@@ -1,0 +1,29 @@
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+			<div class="panel-heading">
+				<h3 class="panel-title">{{heading}}</h3>
+			</div>
+			<div class="panel-body">
+				
+				<canvas id="{{id}}" height="120"></canvas>
+				
+				{% if control == 'yes' %}
+				<div class="row">
+
+                      <div class="col-md-3">
+                      <button class="btn btn-primary "  type="button" data-toggle="collapse" data-target="#{{heading}}-volume-choose" aria-expanded="false" aria-controls="collapseExample">
+                            Controls
+                      </button>
+                      </div>
+                      <div class="col-md-9 text-right paging" style="margin-top: 0px; margin-bottom: 0px" id="{{heading}}-volume-paginator">
+                            
+                      </div>
+                 </div>
+                 {% endif %}
+			</div>
+			{% include 'main/includes/choser2.html' with id=heading|add:"-volume-choose" %}
+
+		</div>
+	</div>
+</div>

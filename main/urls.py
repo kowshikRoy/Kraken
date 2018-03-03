@@ -43,6 +43,7 @@ from .views import (
     Percentile,
     DefaultView,
     CompareView,
+    ChartView,
 
 )
 urlpatterns = [
@@ -63,6 +64,7 @@ urlpatterns = [
     url(r'^api/compare/$', CompareView.as_view()),
     url(r'^api/Product/$', ProductView.as_view()),
     url(r'^api/Client/$', ClientView.as_view()),
+    url(r'^api/chart/$', ChartView.as_view()),
     url(r'^api/Region/$', RegionView.as_view()),
     url(r'^api/SalesMan/$', SalesManView.as_view()),
     url(r'^api/LoadProduct/$', LoadProduct.as_view()),

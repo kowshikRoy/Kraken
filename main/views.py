@@ -77,20 +77,36 @@ def salesmanIndex(request):
 
 def product(request,*args, **kwargs):
 	product = get_object_or_404(Product.objects.all(), pk =kwargs['id'])
-	return render(request, 'main/product.html', {'product': product})
+	return render(request, 'main/product.html', {'product': product,
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()})
 
 
 def client(request,*args, **kwargs):
 	client = get_object_or_404(Client, pk =kwargs['id'])
-	return render(request, 'main/client.html', {'client': client})
+	return render(request, 'main/client.html', {'client': client,
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()})
 
 def region(request,*args, **kwargs):
 	region = get_object_or_404(Region, pk =kwargs['id'])
-	return render(request, 'main/region.html', {'region': region})
+	return render(request, 'main/region.html', {'region': region,
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()})
 
 def salesman(request,*args, **kwargs):
 	salesman = get_object_or_404(SalesMan, pk =kwargs['id'])
-	return render(request, 'main/salesman.html', {'salesman': salesman})
+	return render(request, 'main/salesman.html', {'salesman': salesman, 
+		'products': Product.objects.all(),
+		'clients': Client.objects.all(),
+		'regions': Region.objects.all(),
+		'salesMans': SalesMan.objects.all()})
 
 def predict(request, *args, **kwargs):
 	volume = {}
@@ -106,6 +122,77 @@ def predict(request, *args, **kwargs):
 		year  = t.voucher.date.year;
 		tk[year] += t.amount
 		volume[year] += t.volume
+
+class ChartView(APIView):
+	authentication_classes 	= (SessionAuthentication, BasicAuthentication)
+	permission_classes 		= (IsAuthenticated,)
+
+	def get(self, request, *args, **kwargs) :
+		model = ResolveModel(request.GET['modelName'])
+		transactions = []
+		if model == Product:
+			transactions = Transaction.objects.filter(product__id = request.GET['product'])
+		if model == Client:
+			transactions = Transaction.objects.filter(client__id = request.GET['client'])
+
+		if model == Region:
+			transactions = Transaction.objects.filter(client__region__id = request.GET['region'])
+		
+		if model == SalesMan:
+			transactions = Transaction.objects.filter(client__salesman__id = request.GET['salesman'])
+
+			
+		beginDate 	= datetime.strptime( '2000-01-01','%Y-%m-%d').date()
+		endDate 	= date.today()
+
+		if request.GET['beginDate'] != '':
+			beginDate 	= datetime.strptime(request.GET.get('beginDate', '1900-01-01'),'%Y-%m-%d').date()
+		if request.GET['endDate'] != '':
+			endDate 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
+
+		transactions		= transactions.filter(
+			date__gte = beginDate, date__lte = endDate
+		)
+
+		if request.GET['product'] != '':
+			transactions	= transactions.filter(product_id = request.GET['product'])
+
+		if request.GET['client'] != '':
+			transactions	= transactions.filter(client__id = request.GET['client'])
+		if request.GET['region'] != '':
+			transactions 	= transactions.filter(client__region__id = request.GET['region'])
+		if request.GET['salesman'] != '':
+			transactions 	= transactions.filter(client__salesman__id = request.GET['salesman'])
+
+		beginDate = beginDate .replace(day= 1)
+		endDate 	= (endDate.replace(day = 1) + timedelta(days = 32)). replace(day= 1)
+		label = []
+		dic_volume = {}
+		dic_amount = {}
+		while beginDate < endDate:
+			out = beginDate.strftime('%b %y')
+			label.append(out)
+			dic_volume[out] = 0
+			dic_amount[out] = 0
+			beginDate = (beginDate+timedelta(days=32)).replace(day = 1)
+
+
+
+		for t in transactions: 
+			out = t.date.strftime('%b %y')
+			dic_volume[out] += t.volume
+			dic_amount[out] += t.amount
+
+		data = {
+			'label'  : label,
+			'volume' : [dic_volume[x] for x in label],
+			'tk'	 : [dic_amount[x] for x in label],
+		}
+		return Response(data)
+
+
+		
+
 
 
 class DefaultView(APIView):
@@ -213,11 +300,6 @@ class CompareView(APIView):
 			'label' : label,
 		}
 		return Response(data)
-
-
-
-
-
 
 
 

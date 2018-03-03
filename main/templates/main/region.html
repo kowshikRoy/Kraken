@@ -6,6 +6,7 @@
       <div class="main-content">
       	<div class="container-fluid">
                   <h3 class="page-title">{{region.name}}</h3>
+                  {% include 'main/includes/chart2.html'     with  id="chart-Region" heading="Region" control="yes"%}
                   {% include 'main/includes/tableView.html' with  heading="Product" control="no" %}
                   
             </div>
@@ -18,6 +19,8 @@
 {% block stat %}
 <script type="text/javascript">
    $(function() {
+            LoadChart("Region", null, null, null, null ,{{region.id}}, null);
+            
             LoadTable("Product", "volume", 1, null, null,null, null, {{region.id}}, null);
             LoadTable("Product", "tk", 1, null, null,null, null, {{region.id}}, null);
 
@@ -46,6 +49,28 @@
 
         LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,{{region.id}},salesman);
       }); 
+
+   $("form").submit(function(event){
+            event.preventDefault();
+            var beginDate = document.getElementById(this.id + "-beginDate").value;
+            var endDate = document.getElementById(this.id + "-endDate").value;
+            var e = document.getElementById(this.id + "-product");
+            var product = '', client = '', region= '', salesman = '';
+
+            if(e!= null) product = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-client");
+            if(e != null) client = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-region");
+            if(e != null) region = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-salesman");
+            if(e != null) salesman =e.options[e.selectedIndex].value;
+
+            var info = this.id.split('-');
+            LoadChart(info[0], beginDate, endDate, product, client, {{region.id}}, salesman);
+      });
 
 </script>
 

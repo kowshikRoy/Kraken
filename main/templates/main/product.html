@@ -7,8 +7,10 @@
       	<div class="container-fluid">
                   <h3 class="page-title">{{product.name}}</h3>
                   {% include 'main/includes/chart.html'     with  id="productOnly" heading="Product Behavior in Year" %}
-                  
                   {% include 'main/includes/chart.html'     with  id="productTime" heading="Product Behavior" %}
+
+
+                  {% include 'main/includes/chart2.html'     with  id="chart-Product" heading="Product" control="yes"%}
                   {% include 'main/includes/chart.html'     with  id="prediction-Product" heading="Product Prediction" %}
               
                   
@@ -54,11 +56,34 @@
         });
   }
    $(function() {
+            LoadChart("Product", null, null, {{product.id}}, null ,null, null);
             
             LoadProduct("{{product.id}}");
             LoadPrediction("Product", "{{product.id}}");
 
 
+      });
+
+   $("form").submit(function(event){
+            event.preventDefault();
+            var beginDate = document.getElementById(this.id + "-beginDate").value;
+            var endDate = document.getElementById(this.id + "-endDate").value;
+            var e = document.getElementById(this.id + "-product");
+            var product = '', client = '', region= '', salesman = '';
+
+            if(e!= null) product = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-client");
+            if(e != null) client = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-region");
+            if(e != null) region = e.options[e.selectedIndex].value;
+
+            e = document.getElementById(this.id + "-salesman");
+            if(e != null) salesman =e.options[e.selectedIndex].value;
+
+            var info = this.id.split('-');
+            LoadChart(info[0], beginDate, endDate, {{product.id}}, client, region, {{salesman.id}});
       });
 
 </script>

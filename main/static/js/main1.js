@@ -23,6 +23,27 @@ function LoadTable(modelName, queryType, page=1, beginDate = null, endDate = nul
 });
 }
 
+function LoadChart(modelName, beginDate = null, endDate = null,
+ product=null, client = null, region=null, salesman=null) {
+ $.ajax({
+  method  :"GET",
+  url   :'/api/chart/',
+  data        : {
+    'modelName': modelName,
+   'beginDate' : beginDate,
+   'endDate'   : endDate,
+   'product'   : product,
+   'client'    : client,
+   'region'    : region,
+   'salesman'  : salesman,
+ },
+ success: function(data){
+  console.log(data);
+   drawChart(document.getElementById("chart-"+ modelName), 'line', data,"Volume","Amount");
+ } ,
+});
+}
+
 function LoadDefault(modelName, queryType, page = 1) {
  $.ajax({
   method  :"GET",
@@ -56,7 +77,7 @@ console.log(ctx);
    labels: data['label'],
    datasets: [
    {
-    label: 'Product in Volume',
+    label: l1,
     data: data['volume'],
     
     yAxisID: 'A',
@@ -64,7 +85,7 @@ console.log(ctx);
 
   },
   {
-    label: 'Product in Volume',
+    label: l2,
     data: data['tk'],
     
     yAxisID: 'B',
@@ -82,6 +103,9 @@ options: {
         },
  scales: {
   yAxes: [{
+    ticks: {
+                beginAtZero: true
+            },
    id: 'A',
    type: 'linear',
    position: 'left',
@@ -91,6 +115,9 @@ options: {
   }
 
 }, {
+  ticks: {
+                beginAtZero: true
+            },
   id: 'B',
   scaleLabel: {
    display: true,
