@@ -6,12 +6,11 @@
       <div class="main-content">
       	<div class="container-fluid">
                   <h3 class="page-title">{{product.name}}</h3>
-                  {% include 'main/includes/chart.html'     with  id="productOnly" heading="Product Behavior in Year" %}
-                  {% include 'main/includes/chart.html'     with  id="productTime" heading="Product Behavior" %}
+                  {% include 'main/includes/chart.html'     with  id="productTime" heading="Product behavior over all the years" %}
 
 
                   {% include 'main/includes/chart2.html'     with  id="chart-Product" heading="Product" control="yes"%}
-                  {% include 'main/includes/chart.html'     with  id="prediction-Product" heading="Product Prediction" %}
+                  {% include 'main/includes/chart.html'     with  id="prediction-Product" heading="Product sale prediction" %}
               
                   
             </div>

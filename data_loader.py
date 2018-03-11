@@ -26,7 +26,7 @@ PercentileInfo.objects.all().delete()
 
 
 # Creating Username, Regions and Salesmen
-usernames = ['John', 'Zubaer', 'Repon']
+usernames = ['John', 'Zubaer', 'Repon', 'admin']
 region_names = ['Dhaka','Chittagong', 'Khulna', 'Rajshahi','Barisal','Sylhet','Rangpur','Commilla']
 person_name = ['Ahnaf', 'Shamim', 'Sabbir','Rafi', 'Anik', 'Fardin','Sumon','Rubel','Mahir','Saiful']
 
@@ -43,7 +43,10 @@ transactions = list()
 for i in range(len(usernames)):
     username    = usernames[i]
     user        = User.objects.get_or_create(username= username)[0]
-    user.set_password('123456789zr')
+    if (usernames[i] == 'admin'):
+        user.set_password('admin')
+    else:
+        user.set_password('123456789zr')
     user.save()
 
 for i in range(len(person_name)):

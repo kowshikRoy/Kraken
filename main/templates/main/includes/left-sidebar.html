@@ -3,29 +3,10 @@
 		<nav>
 			<ul class="nav">
 				<li><a href="{% url 'index' %}" {% if option == "home" %} class="active" {% endif %} ><i class="lnr lnr-home"></i> <span>Dashboard</span></a></li>
-				<li><a href="{% url 'products' %}" {% if option == "product" %} class="active" {% endif %} ><i class="lnr lnr-store"></i> <span>Products</span></a></li>
+				<li><a href="{% url 'products' %}" {% if option == "product" %} class="active" {% endif %} ><i class="lnr lnr-cart"></i> <span>Products</span></a></li>
 				<li><a href="{% url 'clients' %}" {% if option == "client" %} class="active" {% endif %} ><i class="lnr lnr-users"></i> <span>Clients</span></a></li>
-				<li><a href="{% url 'regions' %}" {% if option == "region" %} class="active" {% endif %} ><i class="lnr lnr-location"></i> <span>Regions</span></a></li>
-				<li><a href="{% url 'salesmans' %}" {% if option == "salesman" %} class="active" {% endif %} ><i class="lnr lnr-cog"></i> <span>SalesMans</span></a></li>
-				<!-- <li><a href="{% url 'clients' %}" {% if option == "clients" %} class="active" {% endif %}><i class="lnr lnr-code"></i> <span>Clients</span></a></li>
-				<li><a href="charts.html" class=""><i class="lnr lnr-chart-bars"></i> <span>Charts</span></a></li>
-				<li><a href="panels.html" class=""><i class="lnr lnr-cog"></i> <span>Panels</span></a></li>
-				<li><a href="notifications.html" class=""><i class="lnr lnr-alarm"></i> <span>Notifications</span></a></li>
-				<li>
-					<a href="#subPages" data-toggle="collapse" class="collapsed"><i class="lnr lnr-file-empty"></i> <span>Pages</span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>
-					<div id="subPages" class="collapse ">
-						<ul class="nav">
-							<li><a href="page-profile.html" class="">Profile</a></li>
-							<li><a href="page-login.html" class="">Login</a></li>
-							<li><a href="page-lockscreen.html" class="">Lockscreen</a></li>
-						</ul>
-					</div>
-				</li>
-				<li><a href="tables.html" class=""><i class="lnr lnr-dice"></i> <span>Tables</span></a></li>
-				<li><a href="typography.html" class=""><i class="lnr lnr-text-format"></i> <span>Typography</span></a></li>
-				<li><a href="icons.html" class=""><i class="lnr lnr-linearicons"></i> <span>Icons</span></a></li>
- -->
-
+				<li><a href="{% url 'regions' %}" {% if option == "region" %} class="active" {% endif %} ><i class="lnr lnr-map-marker"></i> <span>Regions</span></a></li>
+				<li><a href="{% url 'salesmans' %}" {% if option == "salesman" %} class="active" {% endif %} ><i class="lnr lnr-bicycle"></i> <span>Salesmen</span></a></li>
 			</ul>
 		</nav>
 	</div>
