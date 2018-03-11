@@ -66,8 +66,8 @@ function LoadDefault(modelName, queryType, page = 1) {
 
 
 
-function drawChart(ctx, type, data, l1 = 'Product in Volume',
-  l2 = 'Product in Volume'){
+function drawChart(ctx, type, data, l1 = 'Product in volume',
+  l2 = 'Product in amount'){
 console.log(ctx);
 
  new Chart(ctx,
@@ -111,7 +111,7 @@ options: {
    position: 'left',
    scaleLabel: {
     display: true,
-    labelString: 'Volume'
+    labelString: 'Volume (quantity)'
   }
 
 }, {
@@ -121,7 +121,7 @@ options: {
   id: 'B',
   scaleLabel: {
    display: true,
-   labelString: 'Amount'
+   labelString: 'Amount (Tk)'
  },
 
  type: 'linear',
@@ -136,8 +136,12 @@ xAxes: [{
   barPercentage: .95,
   categoryPercentage: 0.6,
   gridLines: {
-   display:false
- }
+    display:false
+  },
+  scaleLabel: {
+    display:true,
+    labelString: 'Timeline'
+  }
 }],
 }
 }
