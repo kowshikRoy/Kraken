@@ -574,6 +574,7 @@ class LoadProduct(APIView):
 
 		#Year Data
 
+		prediction = {}
 		volume = {}
 		tk = {}
 		label = []
@@ -589,23 +590,30 @@ class LoadProduct(APIView):
 			if year in volume: volume[year] += t.volume
 			else : volume[year] = t.volume
 
-
-
 			yearMin = min(yearMin, t.date.year)
 			yearMax = max(yearMax, t.date.year)
 
+		lastVolume = 0
 
 		for i in range(yearMin, yearMax + 1):
 			label.append(i)
 			if i not in volume: 
 				volume[i] = 0
 				tk[i] = 0
-			
+			else :
+				lastVolume = volume[i]
+			prediction[i] = volume[i]
+
+		for i in range(yearMin, yearMax + 1):
+			if prediction[i] == 0:
+				prediction[i] = lastVolume
 
 		data['year'] = {
 			'label'		: label,
 			'volume' 	: [volume[i] for i in range(yearMin, yearMax + 1)],
-			'tk'		: [tk[i] for i in range(yearMin,yearMax + 1)]
+			'tk'		: [tk[i] for i in range(yearMin,yearMax + 1)],
+			'prediction': [prediction[i] for i in range(yearMin, yearMax + 1)],
+			'lastVolume': lastVolume
 		}
 
 		#This Year Data
