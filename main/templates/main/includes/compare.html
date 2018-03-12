@@ -25,7 +25,7 @@
 					<div class="col-md-4"> 
 						<form>
 						    <label class="radio-inline">
-						      <input type="radio" name="radio" value = "volume">Volume
+						      <input type="radio" name="radio" value = "volume" checked="checked">Volume
 						    </label>
 						    <label class="radio-inline">
 						      <input type="radio" name="radio" value="tk">Amount
@@ -34,13 +34,27 @@
 						  <p id="error"></p>
 					</div>
 					<div class="col-md-2"> 
-						<input type="submit" class="btn btn-primary" name="Compare" value="Compare">
+						<input type="button" class="btn btn-primary" name="Compare" value="Control" data-toggle="collapse" data-target="#{{id}}-chooser" aria-expanded="false" aria-controls="collapseExample">
 					</div>
+					
 				</div>
 			</form>
 			</div>
 			<div class="panel-body">
 				<canvas id="{{id}}-chart" height="120"></canvas>
+				<!-- {% if control == 'yes' %}
+				<div class="row">
+
+                      <div class="col-md-3">
+                      <button class="btn btn-primary "  type="button" data-toggle="collapse" data-target="#{{id}}-chooser" aria-expanded="false" aria-controls="collapseExample">
+                            Controls
+                      </button>
+                      </div>
+                 </div>
+                 {% endif %} -->
+			</div>
+			<div id = "compareSalesman">
+					{% include 'main/includes/choser2.html' with id=id|add:"-chooser" heading="SalesMan" %}
 			</div>
 		</div>
 	</div>

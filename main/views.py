@@ -241,10 +241,35 @@ class CompareView(APIView):
 		print(request.GET)
 		low = date.today()
 		high= low.replace(year = 1990)
+		if request.GET['beginDate'] != '':
+			low 	= datetime.strptime(request.GET.get('beginDate', '1900-01-01'),'%Y-%m-%d').date()
+		if request.GET['endDate'] != '':
+			high 	= datetime.strptime(request.GET.get('endDate', '1900-01-01'),'%Y-%m-%d').date()
 
-		ob1 = Transaction.objects.filter(client__salesman__id = request.GET['p1'])
-		ob2 = Transaction.objects.filter(client__salesman__id = request.GET['p2'])
+		print(low,high)
+		if(low > high) : low,high=high,low
+		# transactions = Transaction.objects.all()
+		transactions		= Transaction.objects.filter(
+			date__gte = low, date__lte = high
+		)
+	
+		
+		if request.GET['product'] != '':
+			transactions	= transactions.filter(product_id = request.GET['product'])
+		if request.GET['client'] != '':
+			transactions	= transactions.filter(client__id = request.GET['client'])
+		if request.GET['region'] != '':
+			transactions 	= transactions.filter(client__region__id = request.GET['region'])
+		if request.GET['salesman'] != '':
+			transactions 	= transactions.filter(client__salesman__id = request.GET['salesman'])
 
+		print(len(transactions))
+		ob1 = transactions.filter(client__salesman__id = request.GET['p1'])
+		ob2 = transactions.filter(client__salesman__id = request.GET['p2'])
+
+		print(len(ob1))
+		print(len(ob2))
+		print(high, low)
 		option = request.GET['queryType']
 		dic = {}
 		dic2 = {}
