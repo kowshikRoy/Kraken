@@ -2,8 +2,11 @@
 <thead>
       <tr>
             <th>Seller Name</th>
-            <th>Amount</th>
+            {% if queryType == "volume" %}
             <th>Volume</th>
+            {% else %}
+            <th>Amount</th>
+           {% endif %}
       </tr>
 </thead>
 <tbody>
@@ -12,8 +15,11 @@
 <tr>
       
 	<td><a href="{% url 'salesman' p.id %}">{{p.name}}</td>
-	<td>{{tk}}</td>
-	<td>{{vol}}</td>
+            {% if queryType == "tk" %}
+            <td>{{tk}}</td>
+            {% else %}
+            <td>{{vol}}</td>
+            {% endif %}
 
 </tr>
 {% endfor %}

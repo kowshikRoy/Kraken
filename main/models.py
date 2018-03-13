@@ -58,8 +58,11 @@ class Transaction(models.Model):
 	volume		= models.FloatField(default = 0)
 	amount		= models.FloatField(default = 0)
 	
+	class Meta:
+		ordering = ['-date']
 	def __str__(self):
 		return  str(self.t_type) + " " + str(self.date) + " " + str(self.client) + " " + str(self. product)
+	
 
 
 class PercentileInfo(models.Model):

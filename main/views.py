@@ -36,7 +36,7 @@ def index(request):
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()
 	})
-
+@login_required
 def productIndex(request):
 	return render(request , 'main/index-product.html', {
 		'products': Product.objects.all(),
@@ -44,7 +44,7 @@ def productIndex(request):
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()
 	})
-
+@login_required
 def clientIndex(request):
 	return render(request , 'main/index-client.html', {
 		'products': Product.objects.all(),
@@ -52,7 +52,7 @@ def clientIndex(request):
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()
 	})
-
+@login_required
 def regionIndex(request):
 	return render(request , 'main/index-region.html', {
 		'products': Product.objects.all(),
@@ -60,7 +60,7 @@ def regionIndex(request):
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()
 	})
-
+@login_required
 def salesmanIndex(request):
 	return render(request , 'main/index-salesman.html', {
 		'products': Product.objects.all(),
@@ -74,7 +74,7 @@ def salesmanIndex(request):
 # def DefaultIndex(request):
 # 	model 	= ResolveModel(request.GET['modelName'])
 	
-
+@login_required
 def product(request,*args, **kwargs):
 	product = get_object_or_404(Product.objects.all(), pk =kwargs['id'])
 	return render(request, 'main/product.html', {'product': product,
@@ -83,7 +83,7 @@ def product(request,*args, **kwargs):
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()})
 
-
+@login_required
 def client(request,*args, **kwargs):
 	client = get_object_or_404(Client, pk =kwargs['id'])
 	return render(request, 'main/client.html', {'client': client,
@@ -91,7 +91,7 @@ def client(request,*args, **kwargs):
 		'clients': Client.objects.all(),
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()})
-
+@login_required
 def region(request,*args, **kwargs):
 	region = get_object_or_404(Region, pk =kwargs['id'])
 	return render(request, 'main/region.html', {'region': region,
@@ -99,7 +99,7 @@ def region(request,*args, **kwargs):
 		'clients': Client.objects.all(),
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()})
-
+@login_required
 def salesman(request,*args, **kwargs):
 	salesman = get_object_or_404(SalesMan, pk =kwargs['id'])
 	return render(request, 'main/salesman.html', {'salesman': salesman, 
@@ -107,7 +107,7 @@ def salesman(request,*args, **kwargs):
 		'clients': Client.objects.all(),
 		'regions': Region.objects.all(),
 		'salesMans': SalesMan.objects.all()})
-
+@login_required
 def predict(request, *args, **kwargs):
 	volume = {}
 	tk = {}
@@ -144,6 +144,8 @@ class ChartView(APIView):
 			
 		beginDate 	= datetime.strptime( '2000-01-01','%Y-%m-%d').date()
 		endDate 	= date.today()
+		beginDate 	= Transaction.objects.last().date
+		endDate 	= Transaction.objects.first().date 
 
 		if request.GET['beginDate'] != '':
 			beginDate 	= datetime.strptime(request.GET.get('beginDate', '1900-01-01'),'%Y-%m-%d').date()
@@ -226,7 +228,7 @@ class DefaultView(APIView):
 			rows = paginator.page(paginator.num_pages)
 
 		data = {
-			'table': render_to_string(t_html, {'objects': rows, 'page-page_range': pg}),
+			'table': render_to_string(t_html, {'objects': rows, 'page-page_range': pg, 'queryType': request.GET['queryType']}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': request.GET['modelName'] + "-" + request.GET['queryType']})
 		}
 		return Response(data)
@@ -391,7 +393,7 @@ class ProductView(APIView):
 
 
 		data = {
-			'table': render_to_string('main/includes/Product-table.html', {'objects': rows, 'page-page_range': pg}),
+			'table': render_to_string('main/includes/Product-table.html', {'objects': rows, 'page-page_range': pg, 'queryType': request.GET['queryType']}),
 			'paginator': render_to_string('main/includes/Paginator.html', {'page': rows, 'page_range': pg, 'id': "Product-" + request.GET['queryType']})
 		}
 		return Response(data)
@@ -677,11 +679,15 @@ class Percentile(APIView):
 	def get(self, request, *args, **kwargs) :
 		p_type = request.GET['modelName']
 		qs = PercentileInfo.objects.filter(p_type = p_type).order_by('number')
+		total = 0
+		for x in qs:
+			total += x.amount
+		
 		label = []
 		for i in range(1,100,20): label.append(str(i)+"-"+str(i+19)+'%')
 		data = {
 			'label' : label,
-			'data'	: [x.amount for x in qs]
+			'data'	: [(x.amount * 100/total) for x in qs]
 		}
 		return Response(data)
 
