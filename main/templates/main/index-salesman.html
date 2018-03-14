@@ -8,7 +8,9 @@
                  
                  {% include 'main/includes/tableView.html' with  heading="SalesMan" %}
                  {% include 'main/includes/chart.html'     with  id="percentile-salesman" heading="Salesman Percentile" %}
+                 <div id="compare">
                  {% include 'main/includes/compare.html'     with  id="comparison-salesman" heading="Compare Two Salesmen" control="yes" %}
+                 </div>
                  
                   
           </div>
@@ -51,14 +53,17 @@
                   } ,
             });
       }
-      
-
       $("form").submit(function(event){
           console.log(1);
             event.preventDefault();
-            var beginDate = document.getElementById(this.id + "-beginDate").value;
-            var endDate = document.getElementById(this.id + "-endDate").value;
-            var e = document.getElementById(this.id + "-product");
+            var beginDate = null, endDate = null;
+            var e = document.getElementById(this.id + '-beginDate');
+            if( e != null ) beginDate = e.value; 
+            
+            e = document.getElementById(this.id + "-endDate");
+            if( e != null ) endDate = e.value;
+           
+            e = document.getElementById(this.id + "-product");
             var product = '', client = '', region= '', salesman = '';
 
             if(e!= null) product = e.options[e.selectedIndex].value;
@@ -72,13 +77,14 @@
             e = document.getElementById(this.id + "-salesman");
             if(e != null) salesman =e.options[e.selectedIndex].value;
 
+
             var info = this.id.split('-');
             console.log(this.id);
             console.log(product);
             console.log(client);
             console.log(region );
             console.log(salesman);
-            if(this.id == "comparison-salesman-chooser") {
+            if(this.id == "comparison-salesman" || this.id == "comparison-salesman-chooser") {
                 var p1 = 0, p2 = 0;
                 var id = "comparison-salesman";
                 var e1 = document.getElementById(id + "-s1");
@@ -135,29 +141,29 @@
       }); 
       
 
-      $("#comparison-salesman").submit(function(event){
-          console.log(1);
-            event.preventDefault();
-            var p1 = 0, p2 = 0;
-            var id = "comparison-salesman";
-            var e1 = document.getElementById(id + "-s1");
-            if (e1 != null) p1 = e1.options[e1.selectedIndex].value;
-            var e2 = document.getElementById(id + "-s2");
-            if(e2 != null) p2  = e2.options[e2.selectedIndex].value;
-            var Value = $('input[name=radio]:checked').val(); 
-            if(p1 > 0 && p2 > 0 && (Value != null && Value != '') ) {
-              $("#compareSalesman").show();
-              $('#comparison-salesman-chart').show();
-                Comparison(p1,p2,Value);
-            }
-            else{
-              console.log(102);
-              $('#comparison-salesman-chart').hide();
-              $("#compareSalesman").hide();
-            }
+    //   $("#comparison-salesman").submit(function(event){
+    //       console.log(1);
+    //         event.preventDefault();
+    //         var p1 = 0, p2 = 0;
+    //         var id = "comparison-salesman";
+    //         var e1 = document.getElementById(id + "-s1");
+    //         if (e1 != null) p1 = e1.options[e1.selectedIndex].value;
+    //         var e2 = document.getElementById(id + "-s2");
+    //         if(e2 != null) p2  = e2.options[e2.selectedIndex].value;
+    //         var Value = $('input[name=radio]:checked').val(); 
+    //         if(p1 > 0 && p2 > 0 && (Value != null && Value != '') ) {
+    //           $("#compareSalesman").show();
+    //           $('#comparison-salesman-chart').show();
+    //             Comparison(p1,p2,Value);
+    //         }
+    //         else{
+    //           console.log(102);
+    //           $('#comparison-salesman-chart').hide();
+    //           $("#compareSalesman").hide();
+    //         }
                 
 
-        });
+    //     });
 
       
 

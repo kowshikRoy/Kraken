@@ -243,6 +243,8 @@ class CompareView(APIView):
 		print(request.GET)
 		low = date.today()
 		high= low.replace(year = 1990)
+		low = Transaction.objects.last().date
+		high = Transaction.objects.first().date 
 		if request.GET['beginDate'] != '':
 			low 	= datetime.strptime(request.GET.get('beginDate', '1900-01-01'),'%Y-%m-%d').date()
 		if request.GET['endDate'] != '':
