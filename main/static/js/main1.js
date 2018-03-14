@@ -55,6 +55,7 @@ function LoadChart(
     },
     success: function(data) {
       console.log(data);
+      document.getElementById("chart-" + modelName + "-area").innerHTML = '<canvas id="chart-' + modelName + '" height="120"></canvas>';
       drawChart(
         document.getElementById("chart-" + modelName),
         "line",
@@ -208,7 +209,7 @@ function drawChart(
 
 
 
-function drawOneChart(ctx, type, data) {
+function drawOneChart(ctx, modelName, type, data) {
   new Chart(ctx, {
     type: type,
     data: {
@@ -235,9 +236,8 @@ function drawOneChart(ctx, type, data) {
             },
             scaleLabel: {
                 display: true,
-                labelString: "Percentile in 100%",
-                
-              }
+                labelString: "Sales percentile in amount"
+            }
           }
         ],
         xAxes: [
@@ -246,12 +246,20 @@ function drawOneChart(ctx, type, data) {
             categoryPercentage: 0.6,
             gridLines: {
               display: false
+            },
+            scaleLabel: {
+                display: true,
+                labelString: capitalizeFirstLetter(modelName) + " percentile"
             }
           }
         ]
       }
     }
   });
+}
+
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function LoadPrediction(modelName, queryId) {
@@ -265,6 +273,7 @@ function LoadPrediction(modelName, queryId) {
     success: function(data) {
       drawOneChart(
         document.getElementById("prediction-" + modelName),
+        modelName,
         "line",
         data
       );
@@ -282,6 +291,7 @@ function LoadPercentlie(modelName) {
     success: function(data) {
       drawOneChart(
         document.getElementById("percentile-" + modelName),
+        modelName,
         "bar",
         data
       );

@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from .utils import proper_paginate, getPercentile,getData,ResolveModel
 from .models import  Region, Product, Client, SalesMan,Transaction,PercentileInfo
 
-pageint = 5
+pageint = 10
 serial = []
 pairs = []
 

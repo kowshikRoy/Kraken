@@ -45,7 +45,7 @@
                     'id'      : queryId,
               },
               success: function(data){
-                  drawOneChart(document.getElementById('prediction-'+modelName),'line', data)
+                  drawOneChart(document.getElementById('prediction-'+modelName),  modelName, 'line', data)
               } ,
         });
   }

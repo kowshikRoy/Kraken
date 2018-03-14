@@ -1,62 +1,63 @@
 <div class="row">
-	<div class="col-md-12">
-		<div class="panel">
-			<div class="panel-heading">
-				<h3 class="panel-title">{{heading}}</h3>
-				<br>	
-				<form class="form" id ="{{id}}">
-				<div class="row">
-					<div class="col-md-3"> 
-						<select id="{{id}}-s1" class="form-control" default="Hi">
-	                          <option value="" selected="selected">None</option>
-	                          {% for entry in salesMans %}
-	                          <option value="{{ entry.id }}">{{ entry.name }}</option>
-	                          {% endfor %}
-	                    </select>
-					</div>
-					<div class="col-md-3"> 
-						<select id="{{id}}-s2" class="form-control" default="Hi">
-	                          <option value="" selected="selected">None</option>
-	                          {% for entry in salesMans %}
-	                          <option value="{{ entry.id }}">{{ entry.name }}</option>
-	                          {% endfor %}
-	                    </select>
-					</div>
-					<div class="col-md-4"> 
-						<form>
-						    <label class="radio-inline">
-						      <input type="radio" name="radio" value = "volume" checked="checked">Volume
-						    </label>
-						    <label class="radio-inline">
-						      <input type="radio" name="radio" value="tk">Amount
-						    </label>
-						  </form>
-						  <p id="error"></p>
-					</div>
-					<div class="col-md-2"> 
-						<input type="submit" class="btn btn-primary" name="Compare" value="Compare">
-						<!-- <input type="button" class="btn btn-primary" name="Compare" value="Control" data-toggle="collapse" data-target="#{{id}}-chooser" aria-expanded="false" aria-controls="collapseExample"> -->
-					</div>
-					
-				</div>
-			</form>
-			</div>
-			<div class="panel-body">
-				<canvas id="{{id}}-chart" height="120"></canvas>
-				{% if control == 'yes' %}
-				<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{heading}}</h3>
+                <br>
+                <form class="form" id="{{id}}">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select id="{{id}}-s1" class="form-control" default="Hi">
+                                <option value="" selected="selected">None</option>
+                                {% for entry in objects %}
+                                <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="{{id}}-s2" class="form-control" default="Hi">
+                                <option value="" selected="selected">None</option>
+                                {% for entry in objects %}
+                                <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <form>
+                                <label class="radio-inline">
+                                    <input type="radio" name="radio" value="volume" checked="checked">Volume
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="radio" value="tk">Amount
+                                </label>
+                            </form>
+                            <p id="error"></p>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="submit" class="btn btn-primary" name="Compare" value="Compare">
+                        </div>
 
-                      <div class="col-md-3">
-                      <button class="btn btn-primary "  type="button" data-toggle="collapse" data-target="#{{id}}-chooser" aria-expanded="false" aria-controls="collapseExample">
+                    </div>
+                </form>
+            </div>
+            <div class="panel-body">
+                <div id="{{id}}-chart-area">
+                </div>
+                {% if control == 'yes' %}
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <button class="btn btn-primary " type="button" data-toggle="collapse"
+                                data-target="#{{id}}-chooser" aria-expanded="false" aria-controls="collapseExample">
                             Controls
-                      </button>
-                      </div>
-                 </div>
-                 {% endif %}
-			</div>
-			<div id = "compareSalesman">
-					{% include 'main/includes/choser2.html' with id=id|add:"-chooser" heading="SalesMan" %}
-			</div>
-		</div>
-	</div>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div id="{{chooserID}}">
+                {% include 'main/includes/choser2.html' with id=id|add:"-chooser" heading=chooserHeading %}
+            </div>
+        </div>
+    </div>
 </div>

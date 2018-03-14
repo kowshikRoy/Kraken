@@ -6,10 +6,12 @@
     <div class="main-content">
         <div class="container-fluid">
 
-            {% include 'main/includes/chart.html' with id="productTime" heading="Product behavior over all the years" %}
-            {% include 'main/includes/chart.html' with id="productOnly" heading="Product behavior in current year" %}
+            {% include 'main/includes/chart.html' with id="productTime" heading="Products behavior over all the years" %}
+            {% include 'main/includes/chart.html' with id="productOnly" heading="Products behavior in current year" %}
             {% include 'main/includes/tableView.html' with heading="Product" %}
-            {% include 'main/includes/chart.html' with id="percentile-product" heading="Products percentile" %}
+            <div id="compare">
+                {% include 'main/includes/compare.html' with id="comparison-product" heading="Compare between two products" chooserHeading="Product" objects=products chooserID="compareProduct" control="yes" %}
+            </div>
 
         </div>
 
@@ -18,66 +20,58 @@
 
 {% endblock main%}
 
-{% block stat %}
 <script type="text/javascript">
-      function LoadProduct(product = null, beginDate = null, endDate = null) {
-            $.ajax({
-                  method      :"GET",
-                  url         :'/api/LoadProduct/' ,
-                  data        : {
-                        'beginDate' : beginDate,
-                        'endDate'   : endDate,
-                        'product'   : product,
-                  },
-                  success: function(data){
-                      drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear'])
-                      drawChart(document.getElementById('productTime'),'line' , data['year'] )
-                        
+    function LoadProduct(product = null, beginDate = null, endDate = null) {
+        $.ajax({
+            method: "GET",
+            url: '/api/LoadProduct/' ,
+            data: {
+                'beginDate' : beginDate,
+                'endDate'   : endDate,
+                'product'   : product,
+            },
+            success: function(data){
+                drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear'])
+                drawChart(document.getElementById('productTime'),'line' , data['year'] )
+            } ,
+        });
+    }
 
-                  } ,
-            });
-      }
+    $(function() {
+        LoadProduct();
+        LoadDefault("Product","volume" ,1);
+        LoadDefault("Product","tk" ,1);
+        LoadPercentlie("product");
+    });
 
+    $("form").submit(function(event){
+        event.preventDefault();
+        var beginDate = document.getElementById(this.id + "-beginDate").value;
+        var endDate = document.getElementById(this.id + "-endDate").value;
+        var product = '', client = '', region= '', salesman = '';
 
-      $(function() {
-            LoadProduct();
-            LoadDefault("Product","volume" ,1);
-            LoadDefault("Product","tk" ,1);
-            // LoadTable("Product", "volume");
-            // LoadTable("Product", 'tk');
+        var e = document.getElementById(this.id + "-product");
+        if(e!= null) product = e.options[e.selectedIndex].value;
 
-            LoadPercentlie("product");
-            
-      });
+        e = document.getElementById(this.id + "-client");
+        if(e != null) client = e.options[e.selectedIndex].value;
 
-      $("form").submit(function(event){
-            event.preventDefault();
-            var beginDate = document.getElementById(this.id + "-beginDate").value;
-            var endDate = document.getElementById(this.id + "-endDate").value;
-            var e = document.getElementById(this.id + "-product");
-            var product = '', client = '', region= '', salesman = '';
+        e = document.getElementById(this.id + "-region");
+        if(e != null) region = e.options[e.selectedIndex].value;
 
-            if(e!= null) product = e.options[e.selectedIndex].value;
+        e = document.getElementById(this.id + "-salesman");
+        if(e != null) salesman =e.options[e.selectedIndex].value;
 
-            e = document.getElementById(this.id + "-client");
-            if(e != null) client = e.options[e.selectedIndex].value;
+        var info = this.id.split('-');
+        LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
+    });
 
-            e = document.getElementById(this.id + "-region");
-            if(e != null) region = e.options[e.selectedIndex].value;
+    $('.paging').on('click', 'a', function(e){
+        e.preventDefault();
 
-            e = document.getElementById(this.id + "-salesman");
-            if(e != null) salesman =e.options[e.selectedIndex].value;
-
-            var info = this.id.split('-');
-            LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
-      });
-      $('.paging').on('click', 'a', function(e){
-        
-        e.preventDefault(); 
-      
         var info = $(this).attr('href').split('-');
         var id  = info[0] + "-" + info[1] + '-choose';
-        
+
         console.log(id);
         var beginDate = document.getElementById(id + "-beginDate").value;
         var endDate = document.getElementById(id + "-endDate").value;
@@ -97,15 +91,14 @@
         e = document.getElementById(id + "-salesman");
         if(e != null) salesman =e.options[e.selectedIndex].value;
 
-        if(beginDate == '' && endDate == '' && 
-          product == '' && client == '' &&
-          region =='' && salesman == '') {
-          console.log(info[0]);
-          LoadDefault(info[0], info[1], info[2]);
+        if(beginDate == '' && endDate == '' &&
+            product == '' && client == '' &&
+            region =='' && salesman == '') {
+            console.log(info[0]);
+            LoadDefault(info[0], info[1], info[2]);
         }
         else LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
-      }); 
-
-
+    });
 </script>
+{% block stat %}
 {% endblock %}
