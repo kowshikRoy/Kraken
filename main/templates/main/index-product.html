@@ -10,6 +10,9 @@
             {% include 'main/includes/chart.html' with id="productOnly" heading="Product behavior in current year" %}
             {% include 'main/includes/tableView.html' with heading="Product" %}
             {% include 'main/includes/chart.html' with id="percentile-product" heading="Products percentile" %}
+            <div id="compare">
+                {% include 'main/includes/compare.html' with id="comparison-product" heading="Compare between two products" chooserHeading="Product" objects=products chooserID="compareProduct" control="yes" %}
+            </div>
 
         </div>
 
@@ -49,28 +52,76 @@
             LoadPercentlie("product");
 
       });
+    function Comparison(p1,p2,queryType, beginDate=null,endDate = null, product=null, client=null,region=null,salesman=null) {
+        $.ajax({
+            method      :"GET",
+            url         :'/api/compare/' ,
+            data        : {
+                'modelName': 'Product',
+                'p1' : p1,
+                'p2' : p2,
+                'queryType': queryType,
+                'beginDate' : beginDate,
+                'endDate'   : endDate,
+                'product'   : product,
+                'client'    : client,
+                'region'    : region,
+                'salesman'  : salesman,
+            },
+            success: function(data){
+                console.log(data);
+                document.getElementById('comparison-product-chart-area').innerHTML='<canvas id="comparison-product-chart" height="120"></canvas>';
+                drawChart(document.getElementById('comparison-product-chart'),'line', data, "First","Second");
+            },
+        });
+    }
 
-      $("form").submit(function(event){
-            event.preventDefault();
-            var beginDate = document.getElementById(this.id + "-beginDate").value;
-            var endDate = document.getElementById(this.id + "-endDate").value;
-            var e = document.getElementById(this.id + "-product");
-            var product = '', client = '', region= '', salesman = '';
+    $("form").submit(function(event){
+        event.preventDefault();
+        var beginDate = null, endDate = null;
+        var e = document.getElementById(this.id + '-beginDate');
+        if( e != null ) beginDate = e.value;
 
-            if(e!= null) product = e.options[e.selectedIndex].value;
+        e = document.getElementById(this.id + "-endDate");
+        if( e != null ) endDate = e.value;
 
-            e = document.getElementById(this.id + "-client");
-            if(e != null) client = e.options[e.selectedIndex].value;
+        e = document.getElementById(this.id + "-product");
+        var product = '', client = '', region= '', salesman = '';
 
-            e = document.getElementById(this.id + "-region");
-            if(e != null) region = e.options[e.selectedIndex].value;
+        if(e!= null) product = e.options[e.selectedIndex].value;
 
-            e = document.getElementById(this.id + "-salesman");
-            if(e != null) salesman =e.options[e.selectedIndex].value;
+        e = document.getElementById(this.id + "-client");
+        if(e != null) client = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(this.id + "-region");
+        if(e != null) region = e.options[e.selectedIndex].value;
+
+        e = document.getElementById(this.id + "-salesman");
+        if(e != null) salesman =e.options[e.selectedIndex].value;
 
             var info = this.id.split('-');
-            LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
-      });
+            if(this.id == "comparison-product" || this.id == "comparison-product-chooser") {
+                var p1 = 0, p2 = 0;
+                var id = "comparison-product";
+                var e1 = document.getElementById(id + "-s1");
+                if (e1 != null) p1 = e1.options[e1.selectedIndex].value;
+                var e2 = document.getElementById(id + "-s2");
+                if(e2 != null) p2  = e2.options[e2.selectedIndex].value;
+                var Value = $('input[name=radio]:checked').val();
+                if(p1 > 0 && p2 > 0 && (Value != null && Value != '') ) {
+                    console.log("Heyyyy!\n\n\n");
+                    console.log(p1);
+                    console.log(p2);
+                    console.log(Value);
+                    $('#comparison-salesman-chart').show();
+                    Comparison(p1,p2,Value, beginDate, endDate, product, client, region, salesman);
+                }
+                else {
+                    console.log(102);
+                }
+            }
+            else LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
+    });
       $('.paging').on('click', 'a', function(e){
 
         e.preventDefault();

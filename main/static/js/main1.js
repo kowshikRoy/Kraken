@@ -95,6 +95,10 @@ function drawChart(
 ) {
   console.log(ctx);
 
+  var secondChartYAxisID = "B";
+  if (l2 == "Second") {
+    secondChartYAxisID = "A";
+  }
   new Chart(ctx, {
     type: type,
     data: {
@@ -113,7 +117,7 @@ function drawChart(
           data: data["tk"],
           hidden : false,
 
-          yAxisID: "B",
+          yAxisID: secondChartYAxisID,
           backgroundColor: "rgba(156, 39, 176, 0.7)"
         }
       ]
@@ -147,8 +151,9 @@ function drawChart(
               beginAtZero: true
             },
             id: "B",
+            display: (secondChartYAxisID == "B"),
             scaleLabel: {
-              display: true,
+              display: (secondChartYAxisID == "B"),
               labelString: "Amount (Tk)",
               
             },
@@ -183,8 +188,10 @@ function drawChart(
                 var index = item.datasetIndex;
                 
                 var ch = $(this)[0].chart;
-                
-                ch.options.scales.yAxes[index].display= !ch.options.scales.yAxes[index].display;
+
+                if (secondChartYAxisID == "B") {
+                    ch.options.scales.yAxes[index].display= !ch.options.scales.yAxes[index].display;
+                }
                 ch.data.datasets[index].hidden = !ch.data.datasets[index].hidden
 
                 if(ch.data.datasets[0].hidden == false) {
