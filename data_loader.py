@@ -220,7 +220,6 @@ for discount_file in discount_files:
             volume=0,
             amount=float(
                 check(sheet.cell_value(rowIdx, DISCOUNT_COLUMN_IDX_FOR_AMOUNT))),
-
         )
         transactions.append(transaction)
         rowIdx += 1

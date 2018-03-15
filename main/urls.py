@@ -44,6 +44,7 @@ from .views import (
     DefaultView,
     CompareView,
     ChartView,
+    DiscountImpactView
 
 )
 urlpatterns = [
@@ -67,6 +68,7 @@ urlpatterns = [
     url(r'^api/Region/$', RegionView.as_view()),
     url(r'^api/SalesMan/$', SalesManView.as_view()),
     url(r'^api/chart/$', ChartView.as_view()),
+    url(r'^api/discount-impact/$', DiscountImpactView.as_view()),
     url(r'^api/LoadProduct/$', LoadProduct.as_view()),
     url(r'^api/percentile/$', Percentile.as_view()),
     # url(r'^api/transaction/$', LatestPurchase.as_view()),

@@ -39,7 +39,7 @@ def index(request):
 @login_required
 def productIndex(request):
     return render(request, 'main/index-product.html', {
-        'products': Product.objects.all(),
+        'products': Product.objects.all().order_by('name'),
         'clients': Client.objects.all(),
         'regions': Region.objects.all(),
         'salesMans': SalesMan.objects.all()
@@ -72,7 +72,7 @@ def salesmanIndex(request):
         'products': Product.objects.all(),
         'clients': Client.objects.all(),
         'regions': Region.objects.all(),
-        'salesMans': SalesMan.objects.all()
+        'salesMans': SalesMan.objects.all().order_by('name')
     })
 
 
@@ -200,6 +200,85 @@ class ChartView(APIView):
             'label': label,
             'volume': [dic_volume[x] for x in label],
             'tk': [dic_amount[x] for x in label],
+        }
+        return Response(data)
+
+
+class DiscountImpactView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        model = ResolveModel(request.GET['modelName'])
+        transactions = []
+        if model == Product:
+            transactions = Transaction.objects.filter(product__id=request.GET['product'])
+        if model == Client:
+            transactions = Transaction.objects.filter(client__id=request.GET['client'])
+        if model == Region:
+            transactions = Transaction.objects.filter(client__region__id=request.GET['region'])
+        if model == SalesMan:
+            transactions = Transaction.objects.filter(client__salesman__id=request.GET['salesman'])
+
+        if request.GET['product'] != '':
+            transactions = transactions.filter(product_id=request.GET['product'])
+        if request.GET['client'] != '':
+            transactions = transactions.filter(client__id=request.GET['client'])
+        if request.GET['region'] != '':
+            transactions = transactions.filter(client__region__id=request.GET['region'])
+        if request.GET['salesman'] != '':
+            transactions = transactions.filter(client__salesman__id=request.GET['salesman'])
+        transactions = transactions.order_by('date')
+
+        threeMonthPrevIdx = 0
+        threeMonthAfterIdx = transactions.count() - 1
+        threeMonthPrevAmount = 0
+        threeMonthAfterAmount = 0
+        discountCount = 0
+        dataRaw = []
+        for i in range(transactions.count()):
+            if transactions[i].t_type == 'PURCHASE':
+                threeMonthPrevAmount = threeMonthPrevAmount + transactions[i].amount
+            elif transactions[i].t_type == 'DISCOUNT':
+                while True:
+                    delta = transactions[i].date - transactions[threeMonthPrevIdx].date
+                    if delta.days <= 90:
+                        break
+                    else:
+                        if transactions[threeMonthPrevIdx].t_type == 'PURCHASE':
+                            threeMonthPrevAmount = threeMonthPrevAmount - transactions[threeMonthPrevIdx].amount
+                        threeMonthPrevIdx = threeMonthPrevIdx + 1
+                discountCount = discountCount + 1
+                dataRaw.append({
+                    'date': transactions[i].date.strftime('%b %d, %Y'),
+                    'discountAmount': transactions[i].amount,
+                    'threeMonthsPrevAmount': threeMonthPrevAmount,
+                    'threeMonthsAfterAmount': 0
+                })
+        for i in reversed(range(transactions.count())):
+            if transactions[i].t_type == 'PURCHASE':
+                threeMonthAfterAmount = threeMonthAfterAmount + transactions[i].amount
+            elif transactions[i].t_type == 'DISCOUNT':
+                while True:
+                    delta = transactions[threeMonthAfterIdx].date - transactions[i].date
+                    if delta.days <= 90:
+                        break
+                    else:
+                        if transactions[threeMonthAfterIdx].t_type == 'PURCHASE':
+                            threeMonthAfterAmount = threeMonthAfterAmount - transactions[threeMonthAfterIdx].amount
+                        threeMonthAfterIdx = threeMonthAfterIdx - 1
+                discountCount = discountCount - 1
+                dataRaw[discountCount]['threeMonthsAfterAmount'] = threeMonthAfterAmount
+        data = {
+            'labels': [['Date: ' + d['date'],
+                        'Discount: ' + str(d['discountAmount']) + ' Tk',
+                        'Amount change : '
+                        + str(round(((d['threeMonthsAfterAmount'] - d['threeMonthsPrevAmount']) / d[
+                            'threeMonthsPrevAmount']) * 100, 2))
+                        + '%'
+                        ] for d in dataRaw],
+            'beforeAmounts': [d['threeMonthsPrevAmount'] for d in dataRaw],
+            'afterAmounts': [d['threeMonthsAfterAmount'] for d in dataRaw]
         }
         return Response(data)
 
@@ -603,7 +682,7 @@ class LoadProduct(APIView):
     permission_classes = (IsAuthenticated,)
 
     def getMWAPrediction3(self, val1, val2, val3):
-        return int(val1 * 0.5 + val2 * 0.3 + val3 * 0.2);
+        return int(val1 * 0.6 + val2 * 0.25 + val3 * 0.15);
 
     def getMWAPrediction2(self, val1, val2):
         return int(val1 * 0.75 + val2 * 0.25);
@@ -611,7 +690,7 @@ class LoadProduct(APIView):
     def getPrediction3(self, val1, val2, val3):
         return int(self.getMWAPrediction3(val1, val2, val3))
 
-    def getPrediction2(self, val1, val2, val3):
+    def getPrediction2(self, val1, val2):
         return int(self.getMWAPrediction2(val1, val2))
 
     def get(self, request, *args, **kwargs):

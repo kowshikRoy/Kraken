@@ -11,24 +11,25 @@ function LoadTable(
   region = null,
   salesman = null
 ) {
-  $.ajax({
-    method: "GET",
-    url: "/api/" + modelName,
-    data: {
-      beginDate: beginDate,
-      endDate: endDate,
-      queryType: queryType,
-      page: page,
-      product: product,
-      client: client,
-      region: region,
-      salesman: salesman
-    },
-    success: function(data) {
-      console.log(data);
-      $("#" + modelName + "-" + queryType + "-table").html(data.table);
-      $("#" + modelName + "-" + queryType + "-paginator").html(data.paginator);
-    }
+    document.getElementById(modelName + "-" + queryType + "-table").innerHTML = "<h4>Loading please wait...</h4>";
+      $.ajax({
+        method: "GET",
+        url: "/api/" + modelName,
+        data: {
+          beginDate: beginDate,
+          endDate: endDate,
+          queryType: queryType,
+          page: page,
+          product: product,
+          client: client,
+          region: region,
+          salesman: salesman
+        },
+        success: function(data) {
+          console.log(data);
+          $("#" + modelName + "-" + queryType + "-table").html(data.table);
+          $("#" + modelName + "-" + queryType + "-paginator").html(data.paginator);
+        }
   });
 }
 
@@ -67,6 +68,36 @@ function LoadChart(
   });
 }
 
+function LoadDiscountImpact (
+    modelName,
+    product = null,
+    client = null,
+    region = null,
+    salesman = null
+) {
+    document.getElementById("discount-" + modelName + "-area").innerHTML = "<h4>Loading please wait...</h4>";
+    $.ajax({
+        method: "GET",
+        url: "/api/discount-impact/",
+        data: {
+            modelName: modelName,
+            product: product,
+            client: client,
+            region: region,
+            salesman: salesman
+        },
+        success: function(data) {
+        console.log(data);
+            document.getElementById("discount-" + modelName + "-area").innerHTML='<canvas id="discount-' + modelName + '" height="' + data["labels"].length*30 + '"></canvas>';
+            drawDiscountGraph(
+                document.getElementById("discount-" + modelName),
+                "horizontalBar",
+                data
+            );
+        }
+    });
+}
+
 function LoadDefault(modelName, queryType, page = 1) {
   $.ajax({
     method: "GET",
@@ -84,6 +115,41 @@ function LoadDefault(modelName, queryType, page = 1) {
       // $('#' + modelName + "-"+ "tk" + "-paginator").html(data.tkPaginator)
     }
   });
+}
+
+function drawDiscountGraph (ctx, type, data) {
+    new Chart (ctx, {
+        type: type,
+        data: {
+            labels: data["labels"],
+            datasets: [
+                {
+                    label: 'Sales amount for 3 months before discount',
+                    data: data["beforeAmounts"],
+                    hidden:false,
+                    backgroundColor: "rgba(3, 169, 244, 0.7)"
+                },
+                {
+                    label: 'Sales amount for 3 months after discount',
+                    data: data["afterAmounts"],
+                    hidden:false,
+                    backgroundColor: "rgba(156, 39, 176, 0.7)"
+                }
+            ]
+        },
+        options: {
+            scales: {
+                xAxes: [
+                    {
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Amount (Tk)",
+                        },
+                    }
+                ]
+            }
+        }
+    });
 }
 
 function drawChart(

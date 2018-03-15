@@ -3,14 +3,13 @@
 {% include 'main/includes/navbar.html' %}
 {% include 'main/includes/left-sidebar.html'  %}
 <div class="main">
-      <div class="main-content">
-      	<div class="container-fluid">
-                  <h3 class="page-title">{{client.name}}</h3>
-                  {% include 'main/includes/chart2.html'     with  id="chart-Client" title="Client analysis" heading="Client" control="yes"%}
-                  {% include 'main/includes/tableView.html' with  heading="Product" control="no" %}
-                 
+    <div class="main-content">
+        <div class="container-fluid">
+            <h3 class="page-title">{{client.name}}</h3>
+                {% include 'main/includes/chart2.html'     with  id="chart-Client" title="Client analysis" heading="Client" control="yes"%}
+                {% include 'main/includes/tableView.html' with  heading="Product" control="no" %}
+                {% include 'main/includes/discount-graph.html' with id="discount-Client" title="Discount impact analysis" %}
             </div>
-
       </div>
 </div>
 
@@ -19,11 +18,12 @@
 {% block stat %}
 <script type="text/javascript">
   
-   $(function() {
-            LoadChart("Client", null, null, null, {{client.id}}, null, null);
-            LoadTable("Product", "volume", 1, null, null,null, "{{client.id}}", null, null);
-            LoadTable("Product", "tk", 1, null, null,null, "{{client.id}}", null, null);
-      });
+    $(function() {
+        LoadChart("Client", null, null, null, {{client.id}}, null, null);
+        LoadTable("Product", "volume", 1, null, null,null, "{{client.id}}", null, null);
+        LoadTable("Product", "tk", 1, null, null,null, "{{client.id}}", null, null);
+        LoadDiscountImpact("Client", null, "{{client.id}}", null, null);
+    });
    $('.paging').on('click', 'a', function(e){
         e.preventDefault(); 
         var info = $(this).attr('href').split('-');
