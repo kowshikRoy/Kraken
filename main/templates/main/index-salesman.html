@@ -9,6 +9,7 @@
             {% include 'main/includes/tableView.html' with  heading="SalesMan" %}
             {% include 'main/includes/chart.html'     with  id="percentile-salesman" heading="Salesmen contribution percentile" %}
             <div id="compare">
+                {% include 'main/includes/distribution-graph.html' with id="distribution-SalesMan" title="Contribution amount (Tk) distribution of salesmen" %}
                 {% include 'main/includes/compare.html' with id="comparison-salesman" heading="Compare between two salesmen" chooserHeading="SalesMan" objects=salesMans chooserID="compareSalesman" control="yes" %}
             </div>
         </div>
@@ -22,6 +23,7 @@
     $(function() {
         LoadDefault("SalesMan","volume", 1);
         LoadDefault("SalesMan","tk", 1);
+        LoadDistribution("SalesMan");
         LoadPercentlie("salesman");
         $('#comparison-salesman-chart').hide()
     });

@@ -300,6 +300,22 @@ class DefaultView(APIView):
         }
         return Response(data)
 
+class DistributionView(APIView):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        model = ResolveModel(request.GET['modelName'])
+        q = model.objects.all().order_by('-amount')
+        totalAmount = 0
+        for d in q:
+            totalAmount = totalAmount + d.amount
+        data = {
+            'labels': [d.name + ' (' + str(round((d.amount*100)/totalAmount, 2)) + '%)' for d in q],
+            'amounts': [d.amount for d in q]
+        }
+        return Response(data)
+
 
 class CompareView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)

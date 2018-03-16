@@ -5,10 +5,9 @@
 <div class="main">
       <div class="main-content">
       	<div class="container-fluid">
-                 
-      		       {% include 'main/includes/tableView.html' with  heading="Client" %}
-                 {% include 'main/includes/chart.html'     with  id="percentile-client" heading="Clients contribution percentile" %}
-                  
+                {% include 'main/includes/tableView.html' with  heading="Client" %}
+                {% include 'main/includes/chart.html'     with  id="percentile-client" heading="Clients contribution percentile" %}
+                <!--{% include 'main/includes/distribution-graph.html' with id="distribution-Client" title="Contribution amount (Tk) distribution of clients" %}-->
           </div>
 
       </div>
@@ -18,16 +17,14 @@
 
 {% block stat %}
 <script type="text/javascript">
-      
-
-      $(function() {
-           LoadDefault("Client", "volume",1);
-           LoadDefault("Client", "tk",1);
-            // LoadTable("Client", "volume");
-            // LoadTable("Client", 'tk');
-            LoadPercentlie("client");
-            
-      });
+    $(function() {
+        LoadDefault("Client", "volume",1);
+        LoadDefault("Client", "tk",1);
+        // LoadTable("Client", "volume");
+        // LoadTable("Client", 'tk');
+        LoadPercentlie("client");
+        //LoadDistribution("Client");
+    });
 
       $("form").submit(function(event){
             event.preventDefault();

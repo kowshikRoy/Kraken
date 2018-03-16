@@ -42,6 +42,7 @@ from .views import (
     LoadProduct,
     Percentile,
     DefaultView,
+    DistributionView,
     CompareView,
     ChartView,
     DiscountImpactView
@@ -62,6 +63,7 @@ urlpatterns = [
     url(r'^s/(?P<id>[0-9]+)/$', salesman, name= 'salesman'),
     # url(r'^cients/$', clients, name = "clientsView"),
     url(r'^api/default/$', DefaultView.as_view()),
+    url(r'^api/distribution/$', DistributionView.as_view()),
     url(r'^api/compare/$', CompareView.as_view()),
     url(r'^api/Product/$', ProductView.as_view()),
     url(r'^api/Client/$', ClientView.as_view()),

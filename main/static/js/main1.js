@@ -117,6 +117,37 @@ function LoadDefault(modelName, queryType, page = 1) {
   });
 }
 
+function LoadDistribution (modelName) {
+    $.ajax({
+        method: "GET",
+        url: "/api/distribution/",
+        data: {
+            modelName: modelName
+        },
+        success: function(data) {
+            document.getElementById("distribution-" + modelName + "-area").innerHTML = '<canvas id="distribution-' + modelName + '"></canvas>';
+            drawDistributionGraph(document.getElementById("distribution-" + modelName), "pie", data);
+        }
+    });
+}
+
+function drawDistributionGraph (ctx, type, data) {
+    new Chart (ctx, {
+        type: type,
+        data: {
+            labels: data["labels"],
+            datasets: [
+                {
+                    label: 'Sales amount',
+                    data: data["amounts"],
+                    hidden:false,
+                    backgroundColor: "rgba(3, 169, 244, 0.7)"
+                }
+            ]
+        }
+    });
+}
+
 function drawDiscountGraph (ctx, type, data) {
     new Chart (ctx, {
         type: type,
