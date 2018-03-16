@@ -119,24 +119,6 @@ def salesman(request, *args, **kwargs):
                                                   'regions': Region.objects.all(),
                                                   'salesMans': SalesMan.objects.all()})
 
-
-@login_required
-def predict(request, *args, **kwargs):
-    volume = {}
-    tk = {}
-    label = []
-
-    for i in range(yearMin, yearMax + 1):
-        label.append(i)
-        volume[i] = 0
-        tk[i] = 0
-
-    for t in transactions:
-        year = t.voucher.date.year;
-        tk[year] += t.amount
-        volume[year] += t.volume
-
-
 class ChartView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
@@ -154,9 +136,8 @@ class ChartView(APIView):
 
         if model == SalesMan:
             transactions = Transaction.objects.filter(client__salesman__id=request.GET['salesman'])
+        transactions = transactions.filter(t_type='PURCHASE')
 
-        beginDate = datetime.strptime('2000-01-01', '%Y-%m-%d').date()
-        endDate = date.today()
         beginDate = Transaction.objects.last().date
         endDate = Transaction.objects.first().date
 
@@ -351,6 +332,7 @@ class CompareView(APIView):
             transactions = transactions.filter(client__region__id=request.GET['region'])
         if request.GET['salesman'] != '':
             transactions = transactions.filter(client__salesman__id=request.GET['salesman'])
+        transactions = transactions.filter(t_type='PURCHASE')
 
         print(len(transactions))
         if (request.GET['modelName'] == 'SalesMan'):
@@ -515,6 +497,7 @@ class ClientView(APIView):
             transactions = transactions.filter(client__region__id=request.GET['region'])
         if request.GET['salesman'] != '':
             transactions = transactions.filter(client__salesman__id=request.GET['salesman'])
+        transactions = transactions.filter(t_type='PURCHASE')
 
         clients = Client.objects.all()
         MapforVolume = {}
@@ -577,6 +560,7 @@ class RegionView(APIView):
             transactions = transactions.filter(client__id=request.GET['client'])
         if request.GET['salesman'] != '':
             transactions = transactions.filter(lient__salesman__id=request.GET['salesman'])
+        transactions = transactions.filter(t_type='PURCHASE')
 
         regions = Region.objects.all()
         MapforVolume = {}
@@ -639,6 +623,7 @@ class SalesManView(APIView):
             transactions = transactions.filter(client__id=request.GET['client'])
         if request.GET['region'] != '':
             transactions = transactions.filter(client__region__id=request.GET['region'])
+        transactions = transactions.filter(t_type='PURCHASE')
 
         salesMans = SalesMan.objects.all()
         MapforVolume = {}
@@ -682,13 +667,19 @@ class LoadProduct(APIView):
     permission_classes = (IsAuthenticated,)
 
     def getMWAPrediction3(self, val1, val2, val3):
-        return int(val1 * 0.6 + val2 * 0.25 + val3 * 0.15);
+        return int(val1 * 0.6 + val2 * 0.25 + val3 * 0.15)
 
     def getMWAPrediction2(self, val1, val2):
-        return int(val1 * 0.75 + val2 * 0.25);
+        return int(val1 * 0.75 + val2 * 0.25)
+
+    def getLSRPrediction3(self, val1, val2, val3):
+        return int(val1 + (val1 - val2) * 0.6 + (val2 - val3) * 0.4)
+
+    def getLSRPrediction2(self, val1, val2):
+        return int(val1 + (val1 - val2))
 
     def getPrediction3(self, val1, val2, val3):
-        return int(self.getMWAPrediction3(val1, val2, val3))
+        return int(self.getMWAPrediction3(val1, val2, val3) * 0.5 + self.getLSRPrediction3(val1, val2, val3) * 0.5)
 
     def getPrediction2(self, val1, val2):
         return int(self.getMWAPrediction2(val1, val2))
@@ -697,6 +688,7 @@ class LoadProduct(APIView):
         transactions = Transaction.objects.all()
         if request.GET['product'] != '':
             transactions = transactions.filter(product__id=request.GET['product'])
+        transactions = transactions.filter(t_type='PURCHASE')
 
         data = {}
         yearMin = date.today().year
@@ -912,6 +904,7 @@ class LatestClient(APIView):
             query = Transaction.objects.filter(date__gte=today - timedelta(days=30), date__lte=today)
         else:
             query = Transaction.objects.filter(date__gte=today.replace(month=1, day=1), date__lte=today)
+        query = query.filter(t_type='PURCHASE')
 
         for c in Client.objects.all(): dic[c] = 0
         for i in query: dic[i.client] += i.amount
@@ -947,7 +940,7 @@ class LoadDefaultClients(APIView):
 
     def get(self, request, *args, **kwargs):
         today = date.today()
-        qs = Transaction.objects.all()
+        qs = Transaction.objects.all().filter(t_type='PURCHASE')
         qyear = qs.filter(date__gte=today.replace(month=1, day=1), voucher__date__lte=today)
         qmonth = qs.filter(date__gte=today - timedelta(days=30), voucher__date__lte=today)
         qweek = qs.filter(voucher__date__gte=today - timedelta(days=7), voucher__date__lte=today)
