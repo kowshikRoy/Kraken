@@ -3,14 +3,13 @@
 {% include 'main/includes/navbar.html' %}
 {% include 'main/includes/left-sidebar.html'  %}
 <div class="main">
-      <div class="main-content">
+    <div class="main-content">
       	<div class="container-fluid">
-                  <h3 class="page-title">{{product.name}}</h3>
-                  {% include 'main/includes/chart.html'     with  id="productTime" heading="Product behavior over all the years" %}
-                  {% include 'main/includes/chart2.html'     with  id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
-            </div>
-
-      </div>
+            <h3 class="page-title">{{product.name}}</h3>
+            {% include 'main/includes/chart.html'     with  id="productTime" heading="Product behavior over all the years" %}
+            {% include 'main/includes/chart2.html'     with  id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
+        </div>
+    </div>
 </div>
 
 {% endblock main%}
@@ -51,7 +50,6 @@
   }
    $(function() {
             LoadChart("Product", null, null, {{product.id}}, null ,null, null);
-
             LoadProduct("{{product.id}}");
             LoadPrediction("Product", "{{product.id}}");
 

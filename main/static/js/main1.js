@@ -294,15 +294,11 @@ function drawChart(
                 if(ch.data.datasets[0].hidden == false) {
                     ch.options.scales.yAxes[0].gridLines.display = true;
                     ch.options.scales.yAxes[1].gridLines.display = false;
-                    
                 }
                 else if(ch.data.datasets[1].hidden == false) {
                     ch.options.scales.yAxes[0].gridLines.display = false;
                     ch.options.scales.yAxes[1].gridLines.display = true;
-                   
                 }
-                
-
                 ch.update();
                 
             }
@@ -476,25 +472,7 @@ function drawChartWithPrediction(
               afterFit: function(scaleInstance) {
                   scaleInstance.width = 100; // sets the width to 100px
                 }
-            },
-            {
-              ticks: {
-                beginAtZero: true
-              },
-              id: "B",
-              scaleLabel: {
-                display: true,
-                labelString: "Amount (Tk)"
-              },
-              type: "linear",
-              position: "right",
-              gridLines: {
-                display: false
-              },
-              afterFit: function(scaleInstance) {
-                  scaleInstance.width = 100; // sets the width to 100px
-                }
-            },
+            }
           ],
           xAxes: [
             {
@@ -513,16 +491,21 @@ function drawChartWithPrediction(
         legend: {
           onClick: function(evt, item) {
                   var index = item.datasetIndex;
-                  console.log(index);
-                  
                   var ch = $(this)[0].chart;
-                  // console.log(ch);
-                  ch.options.scales.yAxes[index].display= !ch.options.scales.yAxes[index].display;
-                  ch.data.datasets[index].hidden = !ch.data.datasets[index].hidden
-                  console.log(ch.options.scales.yAxes[index].display);
-  
+                  ch.data.datasets[index].hidden = !ch.data.datasets[index].hidden;
+                  if (index == 1) {
+                    ch.options.scales.yAxes[index].display = !ch.options.scales.yAxes[index].display;
+                    ch.options.scales.yAxes[index].gridLines.display = !ch.options.scales.yAxes[index].gridLines.display;
+                  } else {
+                    if (ch.data.datasets[0].hidden == ch.data.datasets[2].hidden) {
+                      ch.options.scales.yAxes[0].display = !ch.data.datasets[0].hidden;
+                      ch.options.scales.yAxes[0].gridLines.display = !ch.data.datasets[0].hidden;
+                    } else {
+                      ch.options.scales.yAxes[0].display = true;
+                      ch.options.scales.yAxes[0].gridLines.display = true;
+                    }
+                  }
                   ch.update();
-                  
               }
           },
       }
