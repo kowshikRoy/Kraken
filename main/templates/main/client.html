@@ -6,8 +6,8 @@
     <div class="main-content">
         <div class="container-fluid">
             <h3 class="page-title">{{client.name}}</h3>
-                {% include 'main/includes/chart2.html'     with  id="chart-Client" title="Client analysis" heading="Client" control="yes"%}
-                {% include 'main/includes/tableView.html' with  heading="Product" control="no" %}
+                {% include 'main/includes/chart2.html' with id="chart-Client" title="Client analysis" heading="Client" control="yes"%}
+                {% include 'main/includes/tableView.html' with title="Favourite products" heading="Product" control="no" %}
                 {% include 'main/includes/discount-graph.html' with id="discount-Client" title="Discount impact analysis" %}
             </div>
       </div>

@@ -2,35 +2,27 @@
       <div class="col-md-6">
             <div class="panel">
                   <div class="panel-heading">
-
                         <div class="right">
                               <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
                               <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
-
                         </div>
-
-                        
-                        <h3 class="panel-title"><strong>{{heading}} | Sale in volume</strong></h3>
+                        <h3 class="panel-title"><strong>{{title}} | Sale in volume</strong></h3>
                   </div>
                   <div class="panel-body" >
                         <table class="table table-condensed table-hover table-bordered"
                         id="{{heading}}-volume-table"></table>
                         <div class="row">
                               <div class="col-md-3">
-
                               <button class="btn btn-primary" {% if control == "no" %} style="visibility: hidden;" {%endif %} type="button" data-toggle="collapse" data-target="#{{heading}}-volume-choose" aria-expanded="false" aria-controls="collapseExample">
                                     Controls
                               </button>
                               </div>
                               <div class="col-md-9 text-right paging" style="margin-top: 0px; margin-bottom: 0px" id="{{heading}}-volume-paginator">
-                                    
                               </div>
                         </div>
                   </div>
                   {% include 'main/includes/choser.html' with id=heading|add:"-volume-choose" %}
-                  
             </div>
-
       </div>
       <div class="col-md-6">
             <div class="panel">
@@ -39,7 +31,7 @@
                               <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
                               <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
                         </div>
-                        <h3 class="panel-title"><strong>{{heading}} | Sale in Tk</strong></h3>
+                        <h3 class="panel-title"><strong>{{title}} | Sale in Tk</strong></h3>
                   </div>
                   <div class="panel-body">
                         <table class="table table-condensed table-hover table-bordered"

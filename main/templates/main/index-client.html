@@ -3,14 +3,12 @@
 {% include 'main/includes/navbar.html' %}
 {% include 'main/includes/left-sidebar.html' with option="client" %}
 <div class="main">
-      <div class="main-content">
+    <div class="main-content">
       	<div class="container-fluid">
-                {% include 'main/includes/tableView.html' with  heading="Client" %}
-                {% include 'main/includes/chart.html'     with  id="percentile-client" heading="Clients contribution percentile" %}
-                <!--{% include 'main/includes/distribution-graph.html' with id="distribution-Client" title="Contribution amount (Tk) distribution of clients" %}-->
-          </div>
-
-      </div>
+            {% include 'main/includes/tableView.html' with title="Clients" heading="Client" %}
+            {% include 'main/includes/chart.html' with id="percentile-client" heading="Clients contribution percentile" %}
+        </div>
+    </div>
 </div>
 
 {% endblock main%}
@@ -23,7 +21,6 @@
         // LoadTable("Client", "volume");
         // LoadTable("Client", 'tk');
         LoadPercentlie("client");
-        //LoadDistribution("Client");
     });
 
       $("form").submit(function(event){

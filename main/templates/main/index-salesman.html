@@ -6,7 +6,7 @@
 <div class="main">
     <div class="main-content">
         <div class="container-fluid">
-            {% include 'main/includes/tableView.html' with  heading="SalesMan" %}
+            {% include 'main/includes/tableView.html' with title="Salesmen" heading="SalesMan" %}
             {% include 'main/includes/chart.html'     with  id="percentile-salesman" heading="Salesmen contribution percentile" %}
             <div id="compare">
                 {% include 'main/includes/distribution-graph.html' with id="distribution-SalesMan" title="Contribution amount (Tk) distribution of salesmen" %}

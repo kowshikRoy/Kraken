@@ -8,7 +8,7 @@
 
             {% include 'main/includes/chart.html' with id="productTime" heading="Product behavior over all the years" %}
             {% include 'main/includes/chart.html' with id="productOnly" heading="Product behavior in current year" %}
-            {% include 'main/includes/tableView.html' with heading="Product" %}
+            {% include 'main/includes/tableView.html' with title="Products" heading="Product" %}
             {% include 'main/includes/chart.html' with id="percentile-product" heading="Products percentile" %}
             <div id="compare">
                 {% include 'main/includes/compare.html' with id="comparison-product" heading="Compare between two products" chooserHeading="Product" objects=products chooserID="compareProduct" control="yes" %}

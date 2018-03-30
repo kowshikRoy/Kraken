@@ -3,15 +3,13 @@
 {% include 'main/includes/navbar.html' %}
 {% include 'main/includes/left-sidebar.html' with option="region" %}
 <div class="main">
-      <div class="main-content">
-      	<div class="container-fluid">
-                 
-      		       {% include 'main/includes/tableView.html' with  heading="Region" %}
-                 {% include 'main/includes/chart.html'     with  id="percentile-region" heading="Regions contribution percentile" %}
-                  
-          </div>
-
-      </div>
+    <div class="main-content">
+        <div class="container-fluid">
+            {% include 'main/includes/tableView.html' with title="Regions" heading="Region" %}
+            {% include 'main/includes/chart.html' with id="percentile-region" heading="Regions contribution percentile" %}
+            {% include 'main/includes/distribution-graph.html' with id="distribution-Region" title="Contribution amount (Tk) distribution of regions" %}
+        </div>
+    </div>
 </div>
 
 {% endblock main%}
@@ -42,6 +40,7 @@
             LoadDefault("Region","volume",1);
             LoadDefault("Region","tk",1);
             LoadPercentlie("region");
+            LoadDistribution("Region");
             
       });
 
