@@ -211,55 +211,58 @@ class DiscountImpactView(APIView):
             transactions = transactions.filter(client__salesman__id=request.GET['salesman'])
         transactions = transactions.order_by('date')
 
-        threeMonthPrevIdx = 0
-        threeMonthAfterIdx = transactions.count() - 1
-        threeMonthPrevAmount = 0
-        threeMonthAfterAmount = 0
+        monthPrevIdx = 0
+        monthAfterIdx = transactions.count() - 1
+        monthPrevAmount = 0
+        monthAfterAmount = 0
         discountCount = 0
         dataRaw = []
+        duration = 3
+        if request.GET['duration'] == '6':
+            duration = 6
         for i in range(transactions.count()):
             if transactions[i].t_type == 'PURCHASE':
-                threeMonthPrevAmount = threeMonthPrevAmount + transactions[i].amount
+                monthPrevAmount = monthPrevAmount + transactions[i].amount
             elif transactions[i].t_type == 'DISCOUNT':
                 while True:
-                    delta = transactions[i].date - transactions[threeMonthPrevIdx].date
-                    if delta.days <= 90:
+                    delta = transactions[i].date - transactions[monthPrevIdx].date
+                    if delta.days <= duration * 30:
                         break
                     else:
-                        if transactions[threeMonthPrevIdx].t_type == 'PURCHASE':
-                            threeMonthPrevAmount = threeMonthPrevAmount - transactions[threeMonthPrevIdx].amount
-                        threeMonthPrevIdx = threeMonthPrevIdx + 1
+                        if transactions[monthPrevIdx].t_type == 'PURCHASE':
+                            monthPrevAmount = monthPrevAmount - transactions[monthPrevIdx].amount
+                        monthPrevIdx = monthPrevIdx + 1
                 discountCount = discountCount + 1
                 dataRaw.append({
                     'date': transactions[i].date.strftime('%b %d, %Y'),
                     'discountAmount': transactions[i].amount,
-                    'threeMonthsPrevAmount': threeMonthPrevAmount,
-                    'threeMonthsAfterAmount': 0
+                    'monthsPrevAmount': monthPrevAmount,
+                    'monthsAfterAmount': 0
                 })
         for i in reversed(range(transactions.count())):
             if transactions[i].t_type == 'PURCHASE':
-                threeMonthAfterAmount = threeMonthAfterAmount + transactions[i].amount
+                monthAfterAmount = monthAfterAmount + transactions[i].amount
             elif transactions[i].t_type == 'DISCOUNT':
                 while True:
-                    delta = transactions[threeMonthAfterIdx].date - transactions[i].date
-                    if delta.days <= 90:
+                    delta = transactions[monthAfterIdx].date - transactions[i].date
+                    if delta.days <= duration * 30:
                         break
                     else:
-                        if transactions[threeMonthAfterIdx].t_type == 'PURCHASE':
-                            threeMonthAfterAmount = threeMonthAfterAmount - transactions[threeMonthAfterIdx].amount
-                        threeMonthAfterIdx = threeMonthAfterIdx - 1
+                        if transactions[monthAfterIdx].t_type == 'PURCHASE':
+                            monthAfterAmount = monthAfterAmount - transactions[monthAfterIdx].amount
+                        monthAfterIdx = monthAfterIdx - 1
                 discountCount = discountCount - 1
-                dataRaw[discountCount]['threeMonthsAfterAmount'] = threeMonthAfterAmount
+                dataRaw[discountCount]['monthsAfterAmount'] = monthAfterAmount
         data = {
             'labels': [['Date: ' + d['date'],
                         'Discount: ' + str(d['discountAmount']) + ' Tk',
                         'Amount change : '
-                        + str(round(((d['threeMonthsAfterAmount'] - d['threeMonthsPrevAmount']) / d[
-                            'threeMonthsPrevAmount']) * 100, 2))
+                        + str(round(((d['monthsAfterAmount'] - d['monthsPrevAmount']) / d[
+                            'monthsPrevAmount']) * 100, 2))
                         + '%'
                         ] for d in dataRaw],
-            'beforeAmounts': [d['threeMonthsPrevAmount'] for d in dataRaw],
-            'afterAmounts': [d['threeMonthsAfterAmount'] for d in dataRaw]
+            'beforeAmounts': [d['monthsPrevAmount'] for d in dataRaw],
+            'afterAmounts': [d['monthsAfterAmount'] for d in dataRaw]
         }
         return Response(data)
 

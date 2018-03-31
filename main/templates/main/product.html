@@ -6,8 +6,8 @@
     <div class="main-content">
       	<div class="container-fluid">
             <h3 class="page-title">{{product.name}}</h3>
-            {% include 'main/includes/chart.html'     with  id="productTime" heading="Product behavior over all the years" %}
-            {% include 'main/includes/chart2.html'     with  id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
+            {% include 'main/includes/chart.html' with monthYearOption="yes" id="productTime" heading="Product behavior over all the years" %}
+            {% include 'main/includes/chart2.html' with id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
         </div>
     </div>
 </div>
@@ -16,8 +16,8 @@
 
 {% block stat %}
 <script type="text/javascript">
-  function LoadProduct(product = null, beginDate = null, endDate = null) {
-      console.log(product);
+  function LoadProduct(product = null, beginDate = null, endDate = null, monthYear = 'year') {
+      console.log(monthYear);
         $.ajax({
               method      :"GET",
               url         :'/api/LoadProduct/' ,
@@ -25,16 +25,21 @@
                     'beginDate' : beginDate,
                     'endDate'   : endDate,
                     'product'   : product,
+                    'monthYear' : monthYear
               },
               success: function(data){
                     console.log("DATA - YEAR");
                     console.log(data['year']);
                     drawChartWithPrediction(document.getElementById('productTime'),'line' , data['year']);
                     drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear']);
-
               } ,
         });
   }
+
+  function handleMonthYearSelection(monthYearOption) {
+    LoadProduct("{{product.id}}", null, null, monthYearOption.value);
+  }
+
   function LoadPrediction(modelName, queryId) {
         $.ajax({
               method      :"GET",

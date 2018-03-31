@@ -22,7 +22,7 @@
         LoadChart("Client", null, null, null, {{client.id}}, null, null);
         LoadTable("Product", "volume", 1, null, null,null, "{{client.id}}", null, null);
         LoadTable("Product", "tk", 1, null, null,null, "{{client.id}}", null, null);
-        LoadDiscountImpact("Client", null, "{{client.id}}", null, null);
+        LoadDiscountImpact("Client", null, "{{client.id}}", null, null, 3);
     });
    $('.paging').on('click', 'a', function(e){
         e.preventDefault(); 
@@ -70,6 +70,10 @@
             var info = this.id.split('-');
             LoadChart(info[0], beginDate, endDate, product, "{{client.id}}", region, salesman);
       });
+
+    function handleDiscountImpactDuration(discountImpactDuration) {
+        LoadDiscountImpact("Client", null, "{{client.id}}", null, null, discountImpactDuration.value);
+    }
 
 </script>
 

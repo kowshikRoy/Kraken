@@ -5,25 +5,30 @@
 				<h3 class="panel-title"><strong>{{heading}}</strong></h3>
 			</div>
 			<div class="panel-body">
-				
+				{% if monthYearOption == 'yes' %}
+					<label class="radio-inline active">
+						<input type="radio" name="monthYearOption" onclick="handleMonthYearSelection(this);" value="year" checked="">
+						Year
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="monthYearOption" onclick="handleMonthYearSelection(this);" value="month">
+						Month
+					</label>
+				{% endif %}
 				<canvas id="{{id}}" height="120"></canvas>
-				
 				{% if control == 'yes' %}
 				<div class="row">
-
                       <div class="col-md-3">
                       <button class="btn btn-primary "  type="button" data-toggle="collapse" data-target="#{{heading}}-volume-choose" aria-expanded="false" aria-controls="collapseExample">
                             Controls
                       </button>
                       </div>
                       <div class="col-md-9 text-right paging" style="margin-top: 0px; margin-bottom: 0px" id="{{heading}}-volume-paginator">
-                            
                       </div>
                  </div>
-                 {% endif %}
+				{% endif %}
 			</div>
 			{% include 'main/includes/choser.html' with id=heading|add:"-volume-choose" %}
-
 		</div>
 	</div>
 </div>

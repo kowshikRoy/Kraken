@@ -73,7 +73,8 @@ function LoadDiscountImpact (
     product = null,
     client = null,
     region = null,
-    salesman = null
+    salesman = null,
+    duration = '3'
 ) {
     document.getElementById("discount-" + modelName + "-area").innerHTML = "<h4>Loading please wait...</h4>";
     $.ajax({
@@ -84,7 +85,8 @@ function LoadDiscountImpact (
             product: product,
             client: client,
             region: region,
-            salesman: salesman
+            salesman: salesman,
+            duration: duration
         },
         success: function(data) {
         console.log(data);
@@ -92,7 +94,8 @@ function LoadDiscountImpact (
             drawDiscountGraph(
                 document.getElementById("discount-" + modelName),
                 "horizontalBar",
-                data
+                data,
+                duration
             );
         }
     });
@@ -148,20 +151,20 @@ function drawDistributionGraph (ctx, type, data) {
     });
 }
 
-function drawDiscountGraph (ctx, type, data) {
+function drawDiscountGraph (ctx, type, data, duration) {
     new Chart (ctx, {
         type: type,
         data: {
             labels: data["labels"],
             datasets: [
                 {
-                    label: 'Sales amount for 3 months before discount',
+                    label: 'Sales amount for ' + duration + ' months before discount',
                     data: data["beforeAmounts"],
                     hidden:false,
                     backgroundColor: "rgba(3, 169, 244, 0.7)"
                 },
                 {
-                    label: 'Sales amount for 3 months after discount',
+                    label: 'Sales amount for ' + duration + ' months after discount',
                     data: data["afterAmounts"],
                     hidden:false,
                     backgroundColor: "rgba(156, 39, 176, 0.7)"
