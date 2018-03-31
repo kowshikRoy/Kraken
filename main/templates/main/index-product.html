@@ -7,7 +7,7 @@
         <div class="container-fluid">
 
             {% include 'main/includes/chart.html' with id="productTime" heading="Product behavior over all the years" %}
-            {% include 'main/includes/chart.html' with id="productOnly" heading="Product behavior in current year" %}
+            {% include 'main/includes/chart.html' with id="productOnly" heading="Product behavior in last 12 months" %}
             {% include 'main/includes/tableView.html' with title="Products" heading="Product" %}
             {% include 'main/includes/chart.html' with id="percentile-product" heading="Products percentile" %}
             <div id="compare">
@@ -33,10 +33,10 @@
                         'product'   : product,
                   },
                   success: function(data){
-                      drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear'])
-                      drawChart(document.getElementById('productTime'),'line' , data['year'] )
-
-
+                      document.getElementById("productOnly-area").innerHTML = '<canvas id="chart-productOnly" height="120"></canvas>';
+                      drawChart(document.getElementById('chart-productOnly'),'line', data['onlyThisYear']);
+                      document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
+                      drawChart(document.getElementById('chart-productTime'),'line' , data['year'] );
                   } ,
             });
       }

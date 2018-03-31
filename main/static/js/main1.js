@@ -392,8 +392,10 @@ function LoadPercentlie(modelName) {
       modelName: modelName.toUpperCase()
     },
     success: function(data) {
+      document.getElementById("percentile-" + modelName + "-area").innerHTML = '<canvas id="chart-percentile-' + modelName + '" height="120"></canvas>';
+      console.log(document.getElementById("percentile-" + modelName + "-area").innerHTML);
       drawOneChart(
-        document.getElementById("percentile-" + modelName),
+        document.getElementById("chart-percentile-" + modelName),
         modelName,
         "bar",
         data

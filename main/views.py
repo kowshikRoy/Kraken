@@ -685,14 +685,23 @@ class LoadProduct(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
+    def addMonthsToDate(self, dateVal, monthVal):
+        yearDiff = monthVal // 12
+        monthVal -= yearDiff * 12
+        dayOneDateVal = dateVal.replace(year = dateVal.year + yearDiff, day = 1)
+        if dateVal.month + monthVal > 12:
+            return dayOneDateVal.replace(year = dateVal.year + 1, month = monthVal - (12 - dateVal.month))
+        else:
+            return dayOneDateVal.replace(month = dateVal.month + monthVal)
+
     def getMWAPrediction3(self, val1, val2, val3):
-        return int(val1 * 0.6 + val2 * 0.25 + val3 * 0.15)
+        return int(val1 * 0.65 + val2 * 0.25 + val3 * 0.1)
 
     def getMWAPrediction2(self, val1, val2):
         return int(val1 * 0.75 + val2 * 0.25)
 
     def getLSRPrediction3(self, val1, val2, val3):
-        return int(val1 + (val1 - val2) * 0.6 + (val2 - val3) * 0.4)
+        return int(val1 + (val1 - val2) * 0.7 + (val2 - val3) * 0.3)
 
     def getLSRPrediction2(self, val1, val2):
         return int(val1 + (val1 - val2))
@@ -711,17 +720,18 @@ class LoadProduct(APIView):
 
         data = {}
         yearMin = date.today().year
-        yearMax = date.today().year
+        yearMax = 1900
+        beginDate = date.today()
+        endDate = datetime.strptime('1900-01-01', '%Y-%m-%d').date()
 
         # Year Data
-
         prediction = {}
         volume = {}
         tk = {}
         label = []
 
         for t in transactions:
-            year = t.date.year;
+            year = t.date.year
             if year in tk:
                 tk[year] += t.amount
             else:
@@ -734,60 +744,103 @@ class LoadProduct(APIView):
 
             yearMin = min(yearMin, t.date.year)
             yearMax = max(yearMax, t.date.year)
+            beginDate = min(beginDate, t.date)
+            endDate = max(endDate, t.date)
 
-        for i in range(yearMin, yearMax + 1):
+        for i in range(yearMin, yearMax + 3):
             label.append(i)
             if i not in volume:
                 volume[i] = 0
                 tk[i] = 0
             prediction[i] = volume[i]
 
-        for i in range(yearMin, yearMax + 1):
-            if prediction[i] == 0:
-                if i - yearMin >= 3:
-                    prediction[i] = self.getPrediction3(prediction[i - 1], prediction[i - 2], prediction[i - 3])
-                elif i - yearMin >= 1:
-                    prediction[i] = self.getPrediction2(prediction[i - 1], prediction[i - 2])
-                elif i - yearMin >= 0:
-                    prediction[i] = prediction[i - 1]
-                else:
-                    prediction[i] = 0
+        for i in range(yearMax + 1, yearMax + 3):
+            if i - yearMin >= 3:
+                prediction[i] = self.getPrediction3(prediction[i - 1], prediction[i - 2], prediction[i - 3])
+            elif i - yearMin >= 1:
+                prediction[i] = self.getPrediction2(prediction[i - 1], prediction[i - 2])
+            elif i - yearMin >= 0:
+                prediction[i] = prediction[i - 1]
+            else:
+                prediction[i] = 0
 
         data['year'] = {
             'label': label,
-            'volume': [volume[i] for i in range(yearMin, yearMax + 1)],
-            'tk': [tk[i] for i in range(yearMin, yearMax + 1)],
-            'prediction': [prediction[i] for i in range(yearMin, yearMax + 1)]
+            'volume': [volume[i] for i in range(yearMin, yearMax + 3)],
+            'tk': [tk[i] for i in range(yearMin, yearMax + 3)],
+            'prediction': [prediction[i] for i in range(yearMin, yearMax + 3)]
         }
 
         # This Year Data
-        beginDate = date.today().replace(year=date.today().year - 1, day=1)
-        transactions = transactions.filter(date__gte=beginDate)
+        beginDate = max(beginDate, endDate.replace(year = endDate.year - 1))
+        beginDate = beginDate.replace(day = 1)
+        endDate = self.addMonthsToDate(endDate, 1)
 
+        if beginDate.year == endDate.year:
+            monthCount = endDate.month - beginDate.month
+        else:
+            monthCount = 12 - beginDate.month + endDate.month
+
+        prediction = {}
         volume = {}
         tk = {}
         label = []
-        temp = beginDate
-        print(temp)
-        for i in range(13):
-            out = temp.strftime('%b %y');
-            label.append(out)
-            volume[out] = 0
-            tk[out] = 0
-            temp += timedelta(days=32)
-            print(out)
 
         for t in transactions:
-            out = t.date.strftime('%b %y')
-            tk[out] += t.amount
-            volume[out] += t.volume
+            if t.date < beginDate or t.date >= endDate:
+                continue
+            key = t.date.strftime('%b %y')
+
+            if key in tk:
+                tk[key] += t.amount
+            else:
+                tk[key] = t.amount
+
+            if key in volume:
+                volume[key] += t.volume
+            else:
+                volume[key] = t.volume
+
+        for i in range(0, monthCount + 2):
+            key = self.addMonthsToDate(beginDate, i).strftime('%b %y')
+            label.append(key)
+            if key not in volume:
+                volume[key] = 0
+                tk[key] = 0
+            prediction[key] = volume[key]
+
+        for i in range(monthCount - 3, monthCount - 1):
+            key = self.addMonthsToDate(beginDate, i + 3).strftime('%b %y')
+            oneMonthBeforeKey = self.addMonthsToDate(beginDate, i + 2).strftime('%b %y')
+            twoMonthBeforeKey = self.addMonthsToDate(beginDate, i + 1).strftime('%b %y')
+            threeMonthBeforeKey = self.addMonthsToDate(beginDate, i).strftime('%b %y')
+            if (oneMonthBeforeKey in prediction) and (twoMonthBeforeKey in prediction) and (threeMonthBeforeKey in prediction):
+                prediction[key] = self.getPrediction3(
+                    prediction[oneMonthBeforeKey],
+                    prediction[twoMonthBeforeKey],
+                    prediction[threeMonthBeforeKey]
+                )
+            elif (oneMonthBeforeKey in prediction) and (twoMonthBeforeKey in prediction):
+                prediction[i] = self.getPrediction2(
+                    prediction[oneMonthBeforeKey],
+                    prediction[twoMonthBeforeKey]
+                )
+            elif oneMonthBeforeKey in prediction:
+                prediction[key] = prediction[oneMonthBeforeKey]
+            else:
+                prediction[key] = 0
 
         data['onlyThisYear'] = {
             'label': label,
-            'volume': [volume[i] for i in label],
-            'tk': [tk[i] for i in label]
+            'volume': [],
+            'tk': [],
+            'prediction': []
         }
 
+        for i in range(0, monthCount + 2):
+            data['onlyThisYear']['volume'].append(volume[label[i]])
+            data['onlyThisYear']['tk'].append(tk[label[i]])
+            data['onlyThisYear']['prediction'].append(prediction[label[i]])
         return Response(data)
 
 

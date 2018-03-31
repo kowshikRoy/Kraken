@@ -25,9 +25,10 @@
 				'product'   : product,
 			},
 			success: function(data){
-				drawChart(document.getElementById('productTime'),'line' , data['year'] )
-				drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear'])
-
+				document.getElementById("productOnly-area").innerHTML = '<canvas id="chart-productOnly" height="120"></canvas>';
+                drawChart(document.getElementById('chart-productOnly'),'line', data['onlyThisYear']);
+				document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
+				drawChart(document.getElementById('chart-productTime'),'line' , data['year'] );
 			} ,
 		});
 	}

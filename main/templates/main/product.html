@@ -6,7 +6,7 @@
     <div class="main-content">
       	<div class="container-fluid">
             <h3 class="page-title">{{product.name}}</h3>
-            {% include 'main/includes/chart.html' with monthYearOption="yes" id="productTime" heading="Product behavior over all the years" %}
+            {% include 'main/includes/chart.html' with monthYearOption="yes" id="productTime" heading="Product behavior" %}
             {% include 'main/includes/chart2.html' with id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
         </div>
     </div>
@@ -24,13 +24,17 @@
               data        : {
                     'beginDate' : beginDate,
                     'endDate'   : endDate,
-                    'product'   : product,
-                    'monthYear' : monthYear
+                    'product'   : product
               },
               success: function(data){
-                    console.log("DATA - YEAR");
-                    console.log(data['year']);
-                    drawChartWithPrediction(document.getElementById('productTime'),'line' , data['year']);
+                    console.log(data['onlyThisYear']);
+                    if (monthYear == 'year') {
+                        document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
+                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['year']);
+                    } else if (monthYear == 'month') {
+                        document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
+                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['onlyThisYear']);
+                    }
                     drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear']);
               } ,
         });
