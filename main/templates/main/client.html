@@ -6,6 +6,7 @@
     <div class="main-content">
         <div class="container-fluid">
             <h3 class="page-title">{{client.name}}</h3>
+                {% include 'main/includes/chart.html' with monthYearOption="yes" id="clientTime" heading="Client behavior" %}
                 {% include 'main/includes/chart2.html' with id="chart-Client" title="Client analysis" heading="Client" control="yes"%}
                 {% include 'main/includes/tableView.html' with title="Favourite products" heading="Product" control="no" %}
                 {% include 'main/includes/discount-graph.html' with id="discount-Client" title="Discount impact analysis" %}
@@ -17,11 +18,36 @@
 
 {% block stat %}
 <script type="text/javascript">
-  
+
+    function LoadProduct(client = null, beginDate = null, endDate = null, monthYear = 'year') {
+        $.ajax({
+            method: "GET",
+            url: '/api/LoadProduct/' ,
+            data: {
+                'beginDate': beginDate,
+                'endDate': endDate,
+                'client': client
+            },
+            success: function(data) {
+                document.getElementById("clientTime-area").innerHTML = '<canvas id="chart-clientTime" height="120"></canvas>';
+                if (monthYear == 'year') {
+                    drawChartWithPrediction(document.getElementById('chart-clientTime'),'line' , data['year']);
+                } else if (monthYear == 'month') {
+                    drawChartWithPrediction(document.getElementById('chart-clientTime'),'line' , data['onlyThisYear']);
+                }
+            },
+        });
+    }
+
+    function handleMonthYearSelection(monthYearOption) {
+        LoadProduct("{{client.id}}", null, null, monthYearOption.value);
+    }
+
     $(function() {
         LoadChart("Client", null, null, null, {{client.id}}, null, null);
         LoadTable("Product", "volume", 1, null, null,null, "{{client.id}}", null, null);
         LoadTable("Product", "tk", 1, null, null,null, "{{client.id}}", null, null);
+        LoadProduct("{{client.id}}", null, null, 'year');
         LoadDiscountImpact("Client", null, "{{client.id}}", null, null, 3);
     });
    $('.paging').on('click', 'a', function(e){

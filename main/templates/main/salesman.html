@@ -6,6 +6,7 @@
     <div class="main-content">
         <div class="container-fluid">
             <h3 class="page-title">{{salesman.name}}</h3>
+            {% include 'main/includes/chart.html' with monthYearOption="yes" id="salesmanTime" heading="Salesman behavior" %}
             {% include 'main/includes/chart2.html' with id="chart-SalesMan" title="Salesman analysis" heading="SalesMan" control="yes"%}
             {% include 'main/includes/tableView.html' with title="Most sold products" heading="Product" control="no" %}
         </div>
@@ -16,10 +17,34 @@
 
 {% block stat %}
 <script type="text/javascript">
+
+    function LoadProduct(salesman = null, beginDate = null, endDate = null, monthYear = 'year') {
+        $.ajax({
+            method: "GET",
+            url: '/api/LoadProduct/' ,
+            data: {
+                'beginDate': beginDate,
+                'endDate': endDate,
+                'salesman': salesman
+            },
+            success: function(data) {
+                document.getElementById("salesmanTime-area").innerHTML = '<canvas id="chart-salesmanTime" height="120"></canvas>';
+                if (monthYear == 'year') {
+                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['year']);
+                } else if (monthYear == 'month') {
+                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['onlyThisYear']);
+                }
+            },
+        });
+    }
+
+    function handleMonthYearSelection(monthYearOption) {
+        LoadProduct("{{salesman.id}}", null, null, monthYearOption.value);
+    }
       
    $(function() {
+            LoadProduct("{{salesman.id}}", null, null, 'year');
             LoadChart("SalesMan", null, null, null, null ,null, {{salesman.id}});
-            
             LoadTable("Product", "volume", 1, null, null,null, null, null, "{{salesman.id}}");
             LoadTable("Product", "tk", 1, null, null,null, null,null, "{{salesman.id}}");
             

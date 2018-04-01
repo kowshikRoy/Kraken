@@ -189,6 +189,12 @@ class DiscountImpactView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
+    def getAmountChangePercentage(self, beforeAmount, afterAmount):
+        if beforeAmount == 0:
+            return 'N/A'
+        else:
+            return str(round(((afterAmount - beforeAmount) / beforeAmount) * 100, 2)) + '%'
+
     def get(self, request, *args, **kwargs):
         model = ResolveModel(request.GET['modelName'])
         transactions = []
@@ -256,10 +262,7 @@ class DiscountImpactView(APIView):
         data = {
             'labels': [['Date: ' + d['date'],
                         'Discount: ' + str(d['discountAmount']) + ' Tk',
-                        'Amount change : '
-                        + str(round(((d['monthsAfterAmount'] - d['monthsPrevAmount']) / d[
-                            'monthsPrevAmount']) * 100, 2))
-                        + '%'
+                        'Amount change : ' + self.getAmountChangePercentage(d['monthsPrevAmount'], d['monthsAfterAmount'])
                         ] for d in dataRaw],
             'beforeAmounts': [d['monthsPrevAmount'] for d in dataRaw],
             'afterAmounts': [d['monthsAfterAmount'] for d in dataRaw]
@@ -714,8 +717,16 @@ class LoadProduct(APIView):
 
     def get(self, request, *args, **kwargs):
         transactions = Transaction.objects.all()
-        if request.GET['product'] != '':
+
+        if 'product' in request.GET and request.GET['product'] != '':
             transactions = transactions.filter(product__id=request.GET['product'])
+
+        if 'client' in request.GET and request.GET['client'] != '':
+            transactions = transactions.filter(client__id=request.GET['client'])
+
+        if 'salesman' in request.GET and request.GET['salesman'] != '':
+            transactions = transactions.filter(client__salesman__id=request.GET['salesman'])
+
         transactions = transactions.filter(t_type='PURCHASE')
 
         data = {}
