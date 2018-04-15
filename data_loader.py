@@ -122,10 +122,6 @@ for sales_file in sales_files:
             break
 
         if sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_INVOICE) == 'Invoice':
-            # clientId = save_client_or_return_client_id_if_exists(
-            #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME))
-            # provide random salesmanId and locationId
-
             name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_CLIENT_NAME)
             if (name in dic):
                 client = dic[name]
@@ -139,18 +135,8 @@ for sales_file in sales_files:
 
             time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_DATE), 0)
             date = datetime.datetime(*time_tuple)
-            # voucherId = save_voucher(
-            #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_VOUCHER_NO),
-            #                           clientId, date)
 
         else:
-            # assert that clientId and voucherId >= 0
-            # productId = save_product_or_return_product_id_if_exists(
-            #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_NAME))
-            # save_transaction ('PURCHASE', voucherId, productId,
-            #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_AMOUNT)
-            #                           sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_TOTAL_PRICE))
-
             name = sheet.cell_value(rowIdx, SALES_COLUMN_IDX_FOR_PRODUCT_NAME)
             if name in ProductDic:
                 product = ProductDic[name]
@@ -244,10 +230,6 @@ for return_file in return_files:
     while True:
         if sheet.cell_type(rowIdx, RETURN_COLUMN_IDX_FOR_DATE) != xlrd.XL_CELL_DATE:
             break
-        # clientId = save_client_or_return_client_id_if_exists(
-        #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME))
-        # provide random salesmanId and locationId
-
         name = sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_CLIENT_NAME)
         if name in dic:
             client = dic[name]
@@ -263,13 +245,6 @@ for return_file in return_files:
         time_tuple = xlrd.xldate_as_tuple(sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_DATE), 0)
         date = datetime.datetime(*time_tuple)
         print(date)
-        # voucherId = save_voucher(
-        #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_VOUCHER_NO),
-        #                           clientId, date)
-        # save_transaction ('RETURN', voucherId, null,
-        #                           null,
-        #                           sheet.cell_value(rowIdx, RETURN_COLUMN_IDX_FOR_AMOUNT))
-
         transaction = Transaction(
             t_type='RETURN',
             product=None,
@@ -296,23 +271,6 @@ c_volume = {}
 p_volume = {}
 r_volume = {}
 s_volume = {}
-
-# for p in products: 
-#     p_amount[p.name] = 0 
-#     p_volume[p.name]= 0
-
-# for p in clients: 
-#     c_amount[p.name] = 0 
-#     c_volume[p.name]= 0
-
-# for p in regions: 
-#     r_amount[p.name] = 0 
-#     r_volume[p.name]= 0
-
-# for p in salesmans: 
-#     s_amount[p.name] = 0 
-#     s_volume[p.name]= 0
-
 
 for x in transactions:
     if x is None: continue
@@ -378,10 +336,6 @@ for x in transactions:
     if x.product != None:
         x.product = Dict_Product[x.product.name]
     x.client = Dict_Client[x.client.name]
-
-    # if x.product != None:
-    #     x.product = Dict_Product[x.product.name]
-    # x.client = Dict_Client[x.client.name]
 
 print("Key Resolved")
 Transaction.objects.bulk_create(transactions)

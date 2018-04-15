@@ -2,6 +2,7 @@ from datetime import date, timedelta, datetime
 
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -713,7 +714,8 @@ class LoadProduct(APIView):
         return int(val1 + (val1 - val2))
 
     def getPrediction3(self, val1, val2, val3):
-        return max(0, int(self.getMWAPrediction3(val1, val2, val3) * 0.5 + self.getLSRPrediction3(val1, val2, val3) * 0.5))
+        return max(0,
+                   int(self.getMWAPrediction3(val1, val2, val3) * 0.5 + self.getLSRPrediction3(val1, val2, val3) * 0.5))
 
     def getPrediction2(self, val1, val2):
         return max(0, int(self.getMWAPrediction2(val1, val2)))
@@ -807,7 +809,8 @@ class LoadProduct(APIView):
         if beginDateForMonth.year == endDateForMonth.year:
             monthCount = endDateForMonth.month - beginDateForMonth.month
         else:
-            monthCount = (endDateForMonth.year - beginDateForMonth.year) * 12 - beginDateForMonth.month + endDateForMonth.month
+            monthCount = (
+                                 endDateForMonth.year - beginDateForMonth.year) * 12 - beginDateForMonth.month + endDateForMonth.month
         monthCount = max(monthCount, 0)
 
         prediction = {}
@@ -907,12 +910,12 @@ class LoadProduct(APIView):
             prediction[key] = volume[key]
 
         for i in range(dayCount - 3, dayCount - 1):
-            key = (beginDateForDay + timedelta(days=i+3)).strftime('%b %d, %y')
+            key = (beginDateForDay + timedelta(days=i + 3)).strftime('%b %d, %y')
             if i + 2 >= 0:
-                oneDayBeforeKey = (beginDateForDay + timedelta(days=i+2)).strftime('%b %d, %y')
+                oneDayBeforeKey = (beginDateForDay + timedelta(days=i + 2)).strftime('%b %d, %y')
                 prediction[key] = prediction[oneDayBeforeKey]
             if i + 1 >= 0:
-                twoDaysBeforeKey = (beginDateForDay + timedelta(days=i+1)).strftime('%b %d, %y')
+                twoDaysBeforeKey = (beginDateForDay + timedelta(days=i + 1)).strftime('%b %d, %y')
                 prediction[key] = self.getPrediction2(
                     prediction[oneDayBeforeKey],
                     prediction[twoDaysBeforeKey]
@@ -1183,6 +1186,30 @@ class LoadDefaultClients(APIView):
         }
 
         return Response(data)
+
+
+def uploadFile(request):
+    if request.method == 'POST' and 'dataFile' in request.FILES and 'fileType' in request.POST:
+        dataFile = request.FILES['dataFile']
+        fileType = request.POST['fileType']
+        fs = FileSystemStorage()
+        fs.save(fileType + '/' + dataFile.name, dataFile)
+    return render(request, 'main/uploadFile.html')
+
+
+def deleteData(request):
+    if request.method == 'POST' and 'accept' in request.POST:
+        if request.POST['accept'] == 'yes':
+            print("DELETING")
+            fs = FileSystemStorage()
+            fs.delete('return')
+            # SalesMan.objects.all().delete()
+            # Region.objects.all().delete()
+            # Client.objects.all().delete()
+            # Product.objects.all().delete()
+            # Transaction.objects.all().delete()
+            # PercentileInfo.objects.all().delete()
+    return render(request, 'main/deleteData.html')
 
 
 def loginView(request):

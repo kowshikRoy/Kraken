@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+{% block main %}
+{% include 'main/includes/navbar.html' %}
+{% include 'main/includes/left-sidebar.html' with option="home" %}
+<div class="main">
+    <div class="main-content">
+        <div class="container-fluid">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                File type:<br/>
+                <div class="radio">
+                    <label><input type="radio" name="fileType" value="discount">Discount</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="fileType" value="sales">Sales</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="fileType" value="return">Return</label>
+                </div>
+                <input type="file" name="dataFile">
+                <br/>
+                <button class="btn btn-default" type="submit">Upload</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock main%}

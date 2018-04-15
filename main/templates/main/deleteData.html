@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+{% block main %}
+{% include 'main/includes/navbar.html' %}
+{% include 'main/includes/left-sidebar.html' with option="home" %}
+<div class="main">
+    <div class="main-content">
+        <div class="container-fluid">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="checkbox">
+                    <label><input type="checkbox" name="accept" value="yes">I want to delete all the data</label>
+                </div>
+                <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock main%}

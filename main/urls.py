@@ -14,7 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.contrib import admin
 
 from .views import (
     index,
@@ -22,15 +21,8 @@ from .views import (
     salesmanIndex,
     clientIndex,
     regionIndex,
-    clients,
-    ChartData,
-    Check,
-    LatestPurchase,
-    LatestClient,
-    LoadDefaultClients,
     loginView,
     logoutView,
-    test,
     ProductView,
     ClientView,
     RegionView,
@@ -45,22 +37,27 @@ from .views import (
     DistributionView,
     CompareView,
     ChartView,
-    DiscountImpactView
+    DiscountImpactView,
+    uploadFile,
+    deleteData
 
 )
+
 urlpatterns = [
     # url(r'^test/$', test),
-    url(r'^$', index, name = "index"),
-    url(r'^products/$', productIndex, name = "products"),
-    url(r'^clients/$', clientIndex, name = "clients"),
-    url(r'^regions/$', regionIndex, name = "regions"),
-    url(r'^salesmans/$', salesmanIndex, name = "salesmans"),
-    url(r'^login/',loginView, name= "login"),
-    url(r'^logout/', logoutView, name= "logout"),
-    url(r'^p/(?P<id>[0-9]+)/$', product, name= 'product'),
-    url(r'^c/(?P<id>[0-9]+)/$', client, name= 'client'),
-    url(r'^r/(?P<id>[0-9]+)/$', region, name= 'region'),
-    url(r'^s/(?P<id>[0-9]+)/$', salesman, name= 'salesman'),
+    url(r'^upload/$', uploadFile, name='upload'),
+    url(r'^delete/$', deleteData, name='delete'),
+    url(r'^$', index, name="index"),
+    url(r'^products/$', productIndex, name="products"),
+    url(r'^clients/$', clientIndex, name="clients"),
+    url(r'^regions/$', regionIndex, name="regions"),
+    url(r'^salesmans/$', salesmanIndex, name="salesmans"),
+    url(r'^login/', loginView, name="login"),
+    url(r'^logout/', logoutView, name="logout"),
+    url(r'^p/(?P<id>[0-9]+)/$', product, name='product'),
+    url(r'^c/(?P<id>[0-9]+)/$', client, name='client'),
+    url(r'^r/(?P<id>[0-9]+)/$', region, name='region'),
+    url(r'^s/(?P<id>[0-9]+)/$', salesman, name='salesman'),
     # url(r'^cients/$', clients, name = "clientsView"),
     url(r'^api/default/$', DefaultView.as_view()),
     url(r'^api/distribution/$', DistributionView.as_view()),
