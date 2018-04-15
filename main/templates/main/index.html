@@ -3,19 +3,19 @@
 {% include 'main/includes/navbar.html' %}
 {% include 'main/includes/left-sidebar.html' with option="home" %}
 <div class="main">
-	<div class="main-content">
-		<div class="container-fluid">
-			{% include 'main/includes/chart.html'     with  id="productTime" heading="Products behavior over all the years" %}
-			{% include 'main/includes/chart.html'     with  id="productOnly" heading="Products behavior in current year" %}
-		</div>
-	</div>
+    <div class="main-content">
+        <div class="container-fluid">
+            {% include 'main/includes/chart.html' with id="product-day-wise" heading="Products (day-wise)" dateChooser="yes" %}
+            {% include 'main/includes/chart.html' with id="product-month-wise" heading="Products (month-wise)" dateChooser="yes" %}
+            {% include 'main/includes/chart.html' with id="product-year-wise" heading="Products (year-wise)" dateChooser="yes" %}
+        </div>
+    </div>
 </div>
-
 {% endblock main%}
 
 {% block stat %}
 <script type="text/javascript">
-	function LoadProduct(product = null, beginDate = null, endDate = null) {
+    function LoadProductDay(product = null, beginDate = null, endDate = null) {
 		$.ajax({
 			method      :"GET",
 			url         :'/api/LoadProduct/' ,
@@ -25,66 +25,77 @@
 				'product'   : product,
 			},
 			success: function(data){
-				document.getElementById("productOnly-area").innerHTML = '<canvas id="chart-productOnly" height="120"></canvas>';
-                drawChart(document.getElementById('chart-productOnly'),'line', data['onlyThisYear']);
-				document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
-				drawChart(document.getElementById('chart-productTime'),'line' , data['year'] );
+			    console.log(data);
+				document.getElementById("product-day-wise-area").innerHTML = '<canvas id="chart-product-day-wise" height="120"></canvas>';
+                drawChart(document.getElementById('chart-product-day-wise'),'line', data['dayWise']);
 			} ,
 		});
 	}
 
-	
+	function LoadProductMonth(product = null, beginDate = null, endDate = null) {
+		$.ajax({
+			method      :"GET",
+			url         :'/api/LoadProduct/' ,
+			data        : {
+				'beginDate' : beginDate,
+				'endDate'   : endDate,
+				'product'   : product,
+			},
+			success: function(data){
+			    console.log(data);
+				document.getElementById("product-month-wise-area").innerHTML = '<canvas id="chart-product-month-wise" height="120"></canvas>';
+                drawChart(document.getElementById('chart-product-month-wise'),'line', data['monthWise']);
+			} ,
+		});
+	}
+
+	function LoadProductYear(product = null, beginDate = null, endDate = null) {
+		$.ajax({
+			method      :"GET",
+			url         :'/api/LoadProduct/' ,
+			data        : {
+				'beginDate' : beginDate,
+				'endDate'   : endDate,
+				'product'   : product,
+			},
+			success: function(data){
+				document.getElementById("product-year-wise-area").innerHTML = '<canvas id="chart-product-year-wise" height="120"></canvas>';
+				drawChart(document.getElementById('chart-product-year-wise'),'line' , data['yearWise'] );
+			} ,
+		});
+	}
 
 	$(function() {
-		LoadProduct();
-		LoadPercentlie("product");
+	    LoadProductDay();
+		LoadProductMonth();
+		LoadProductYear();
 	});
 
-	$("form").submit(function(event){
-		event.preventDefault();
-		var beginDate = document.getElementById(this.id + "-beginDate").value;
-		var endDate = document.getElementById(this.id + "-endDate").value;
-		var e = document.getElementById(this.id + "-product");
-		var product = '', client = '', region= '', salesman = '';
+    $("#product-day-wise-date-chooser").submit(function( event ) {
+	    LoadProductDay(
+	        null,
+	        document.getElementById('product-day-wise-date-chooser-begin-date').value,
+	        document.getElementById('product-day-wise-date-chooser-end-date').value
+        );
+        event.preventDefault();
+    });
 
-		if(e!= null) product = e.options[e.selectedIndex].value;
+	$("#product-month-wise-date-chooser").submit(function( event ) {
+	    LoadProductMonth(
+	        null,
+	        document.getElementById('product-month-wise-date-chooser-begin-date').value,
+	        document.getElementById('product-month-wise-date-chooser-end-date').value
+        );
+        event.preventDefault();
+    });
 
-		e = document.getElementById(this.id + "-client");
-		if(e != null) client = e.options[e.selectedIndex].value;
-
-		e = document.getElementById(this.id + "-region");
-		if(e != null) region = e.options[e.selectedIndex].value;
-
-		e = document.getElementById(this.id + "-salesman");
-		if(e != null) salesman =e.options[e.selectedIndex].value;
-
-		var info = this.id.split('-');
-		LoadTable(info[0], info[1], 1 , beginDate, endDate,product,client,region,salesman);
-	});
-	$('.paging').on('click', 'a', function(e){
-		e.preventDefault(); 
-		var info = $(this).attr('href').split('-');
-		var id  = info[0] + "-" + info[1] + '-choose';
-
-		console.log(id);
-		var beginDate = document.getElementById(id + "-beginDate").value;
-		var endDate = document.getElementById(id + "-endDate").value;
-		var e = document.getElementById(id + "-product");
-		var product = '', client = '', region= '', salesman = '';
-
-		if(e!= null) product = e.options[e.selectedIndex].value;
-
-		e = document.getElementById(id + "-client");
-		if(e != null) client = e.options[e.selectedIndex].value;
-
-		e = document.getElementById(id + "-region");
-		if(e != null) region = e.options[e.selectedIndex].value;
-
-		e = document.getElementById(id + "-salesman");
-		if(e != null) salesman =e.options[e.selectedIndex].value;
-
-		LoadTable(info[0], info[1], info[2], beginDate, endDate,product,client,region,salesman);
-	}); 
-
+    $("#product-year-wise-date-chooser").submit(function( event ) {
+	    LoadProductYear(
+	        null,
+	        document.getElementById('product-year-wise-date-chooser-begin-date').value,
+	        document.getElementById('product-year-wise-date-chooser-end-date').value
+        );
+        event.preventDefault();
+    });
 </script>
 {% endblock %}

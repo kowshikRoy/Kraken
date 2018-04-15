@@ -119,6 +119,7 @@ def salesman(request, *args, **kwargs):
                                                   'regions': Region.objects.all(),
                                                   'salesMans': SalesMan.objects.all()})
 
+
 class ChartView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
@@ -262,7 +263,8 @@ class DiscountImpactView(APIView):
         data = {
             'labels': [['Date: ' + d['date'],
                         'Discount: ' + str(d['discountAmount']) + ' Tk',
-                        'Amount change : ' + self.getAmountChangePercentage(d['monthsPrevAmount'], d['monthsAfterAmount'])
+                        'Amount change : ' + self.getAmountChangePercentage(d['monthsPrevAmount'],
+                                                                            d['monthsAfterAmount'])
                         ] for d in dataRaw],
             'beforeAmounts': [d['monthsPrevAmount'] for d in dataRaw],
             'afterAmounts': [d['monthsAfterAmount'] for d in dataRaw]
@@ -306,6 +308,7 @@ class DefaultView(APIView):
         }
         return Response(data)
 
+
 class DistributionView(APIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
@@ -317,7 +320,7 @@ class DistributionView(APIView):
         for d in q:
             totalAmount = totalAmount + d.amount
         data = {
-            'labels': [d.name + ' (' + str(round((d.amount*100)/totalAmount, 2)) + '%)' for d in q],
+            'labels': [d.name + ' (' + str(round((d.amount * 100) / totalAmount, 2)) + '%)' for d in q],
             'amounts': [d.amount for d in q]
         }
         return Response(data)
@@ -691,11 +694,11 @@ class LoadProduct(APIView):
     def addMonthsToDate(self, dateVal, monthVal):
         yearDiff = monthVal // 12
         monthVal -= yearDiff * 12
-        dayOneDateVal = dateVal.replace(year = dateVal.year + yearDiff, day = 1)
+        dayOneDateVal = dateVal.replace(year=dateVal.year + yearDiff, day=1)
         if dateVal.month + monthVal > 12:
-            return dayOneDateVal.replace(year = dateVal.year + 1, month = monthVal - (12 - dateVal.month))
+            return dayOneDateVal.replace(year=dayOneDateVal.year + 1, month=monthVal - (12 - dayOneDateVal.month))
         else:
-            return dayOneDateVal.replace(month = dateVal.month + monthVal)
+            return dayOneDateVal.replace(month=dayOneDateVal.month + monthVal)
 
     def getMWAPrediction3(self, val1, val2, val3):
         return int(val1 * 0.65 + val2 * 0.25 + val3 * 0.1)
@@ -710,13 +713,14 @@ class LoadProduct(APIView):
         return int(val1 + (val1 - val2))
 
     def getPrediction3(self, val1, val2, val3):
-        return int(self.getMWAPrediction3(val1, val2, val3) * 0.5 + self.getLSRPrediction3(val1, val2, val3) * 0.5)
+        return max(0, int(self.getMWAPrediction3(val1, val2, val3) * 0.5 + self.getLSRPrediction3(val1, val2, val3) * 0.5))
 
     def getPrediction2(self, val1, val2):
-        return int(self.getMWAPrediction2(val1, val2))
+        return max(0, int(self.getMWAPrediction2(val1, val2)))
 
     def get(self, request, *args, **kwargs):
         transactions = Transaction.objects.all()
+        transactions = transactions.filter(t_type='PURCHASE')
 
         if 'product' in request.GET and request.GET['product'] != '':
             transactions = transactions.filter(product__id=request.GET['product'])
@@ -727,15 +731,24 @@ class LoadProduct(APIView):
         if 'salesman' in request.GET and request.GET['salesman'] != '':
             transactions = transactions.filter(client__salesman__id=request.GET['salesman'])
 
-        transactions = transactions.filter(t_type='PURCHASE')
+        if 'beginDate' in request.GET and request.GET['beginDate'] != '':
+            requestBeginDate = datetime.strptime(request.GET['beginDate'], '%Y-%m-%d').date()
+            transactions = transactions.filter(date__gte=requestBeginDate)
+        else:
+            requestBeginDate = ''
+
+        if 'endDate' in request.GET and request.GET['endDate'] != '':
+            requestEndDate = datetime.strptime(request.GET['endDate'], '%Y-%m-%d').date()
+            transactions = transactions.filter(date__lte=requestEndDate)
 
         data = {}
+
+        # yearWise Data
         yearMin = date.today().year
         yearMax = 1900
         beginDate = date.today()
         endDate = datetime.strptime('1900-01-01', '%Y-%m-%d').date()
 
-        # Year Data
         prediction = {}
         volume = {}
         tk = {}
@@ -768,29 +781,34 @@ class LoadProduct(APIView):
         for i in range(yearMax + 1, yearMax + 3):
             if i - yearMin >= 3:
                 prediction[i] = self.getPrediction3(prediction[i - 1], prediction[i - 2], prediction[i - 3])
-            elif i - yearMin >= 1:
+            elif i - yearMin >= 2:
                 prediction[i] = self.getPrediction2(prediction[i - 1], prediction[i - 2])
-            elif i - yearMin >= 0:
+            elif i - yearMin >= 1:
                 prediction[i] = prediction[i - 1]
             else:
                 prediction[i] = 0
 
-        data['year'] = {
+        data['yearWise'] = {
             'label': label,
             'volume': [volume[i] for i in range(yearMin, yearMax + 3)],
             'tk': [tk[i] for i in range(yearMin, yearMax + 3)],
             'prediction': [prediction[i] for i in range(yearMin, yearMax + 3)]
         }
 
-        # This Year Data
-        beginDate = max(beginDate, endDate.replace(year = endDate.year - 1))
-        beginDate = beginDate.replace(day = 1)
-        endDate = self.addMonthsToDate(endDate, 1)
-
-        if beginDate.year == endDate.year:
-            monthCount = endDate.month - beginDate.month
+        # monthWise Data
+        if requestBeginDate == '':
+            beginDateForMonth = max(beginDate, endDate.replace(year=endDate.year - 1))
+            beginDateForMonth = beginDateForMonth.replace(day=1)
         else:
-            monthCount = 12 - beginDate.month + endDate.month
+            beginDateForMonth = beginDate
+
+        endDateForMonth = self.addMonthsToDate(endDate, 1)
+
+        if beginDateForMonth.year == endDateForMonth.year:
+            monthCount = endDateForMonth.month - beginDateForMonth.month
+        else:
+            monthCount = (endDateForMonth.year - beginDateForMonth.year) * 12 - beginDateForMonth.month + endDateForMonth.month
+        monthCount = max(monthCount, 0)
 
         prediction = {}
         volume = {}
@@ -798,7 +816,7 @@ class LoadProduct(APIView):
         label = []
 
         for t in transactions:
-            if t.date < beginDate or t.date >= endDate:
+            if t.date < beginDateForMonth or t.date >= endDateForMonth:
                 continue
             key = t.date.strftime('%b %y')
 
@@ -813,7 +831,7 @@ class LoadProduct(APIView):
                 volume[key] = t.volume
 
         for i in range(0, monthCount + 2):
-            key = self.addMonthsToDate(beginDate, i).strftime('%b %y')
+            key = self.addMonthsToDate(beginDateForMonth, i).strftime('%b %y')
             label.append(key)
             if key not in volume:
                 volume[key] = 0
@@ -821,27 +839,25 @@ class LoadProduct(APIView):
             prediction[key] = volume[key]
 
         for i in range(monthCount - 3, monthCount - 1):
-            key = self.addMonthsToDate(beginDate, i + 3).strftime('%b %y')
-            oneMonthBeforeKey = self.addMonthsToDate(beginDate, i + 2).strftime('%b %y')
-            twoMonthBeforeKey = self.addMonthsToDate(beginDate, i + 1).strftime('%b %y')
-            threeMonthBeforeKey = self.addMonthsToDate(beginDate, i).strftime('%b %y')
-            if (oneMonthBeforeKey in prediction) and (twoMonthBeforeKey in prediction) and (threeMonthBeforeKey in prediction):
+            key = self.addMonthsToDate(beginDateForMonth, i + 3).strftime('%b %y')
+            if i + 2 >= 0:
+                oneMonthBeforeKey = self.addMonthsToDate(beginDateForMonth, i + 2).strftime('%b %y')
+                prediction[key] = prediction[oneMonthBeforeKey]
+            if i + 1 >= 0:
+                twoMonthBeforeKey = self.addMonthsToDate(beginDateForMonth, i + 1).strftime('%b %y')
+                prediction[key] = self.getPrediction2(
+                    prediction[oneMonthBeforeKey],
+                    prediction[twoMonthBeforeKey]
+                )
+            if i >= 0:
+                threeMonthBeforeKey = self.addMonthsToDate(beginDateForMonth, i).strftime('%b %y')
                 prediction[key] = self.getPrediction3(
                     prediction[oneMonthBeforeKey],
                     prediction[twoMonthBeforeKey],
                     prediction[threeMonthBeforeKey]
                 )
-            elif (oneMonthBeforeKey in prediction) and (twoMonthBeforeKey in prediction):
-                prediction[i] = self.getPrediction2(
-                    prediction[oneMonthBeforeKey],
-                    prediction[twoMonthBeforeKey]
-                )
-            elif oneMonthBeforeKey in prediction:
-                prediction[key] = prediction[oneMonthBeforeKey]
-            else:
-                prediction[key] = 0
 
-        data['onlyThisYear'] = {
+        data['monthWise'] = {
             'label': label,
             'volume': [],
             'tk': [],
@@ -849,9 +865,78 @@ class LoadProduct(APIView):
         }
 
         for i in range(0, monthCount + 2):
-            data['onlyThisYear']['volume'].append(volume[label[i]])
-            data['onlyThisYear']['tk'].append(tk[label[i]])
-            data['onlyThisYear']['prediction'].append(prediction[label[i]])
+            data['monthWise']['volume'].append(volume[label[i]])
+            data['monthWise']['tk'].append(tk[label[i]])
+            data['monthWise']['prediction'].append(prediction[label[i]])
+
+        # dayWise Data
+        if requestBeginDate == '':
+            beginDateForDay = max(beginDate, endDate - timedelta(days=30))
+        else:
+            beginDateForDay = beginDate
+
+        endDateForDay = endDate + timedelta(days=1)
+
+        dayCount = (endDateForDay - beginDateForDay).days
+
+        prediction = {}
+        volume = {}
+        tk = {}
+        label = []
+
+        for t in transactions:
+            if t.date < beginDateForDay or t.date >= endDateForDay:
+                continue
+            key = t.date.strftime('%b %d, %y')
+            if key in tk:
+                tk[key] += t.amount
+            else:
+                tk[key] = t.amount
+
+            if key in volume:
+                volume[key] += t.volume
+            else:
+                volume[key] = t.volume
+
+        for i in range(0, dayCount + 2):
+            key = (beginDateForDay + timedelta(days=i)).strftime('%b %d, %y')
+            label.append(key)
+            if key not in volume:
+                volume[key] = 0
+                tk[key] = 0
+            prediction[key] = volume[key]
+
+        for i in range(dayCount - 3, dayCount - 1):
+            key = (beginDateForDay + timedelta(days=i+3)).strftime('%b %d, %y')
+            if i + 2 >= 0:
+                oneDayBeforeKey = (beginDateForDay + timedelta(days=i+2)).strftime('%b %d, %y')
+                prediction[key] = prediction[oneDayBeforeKey]
+            if i + 1 >= 0:
+                twoDaysBeforeKey = (beginDateForDay + timedelta(days=i+1)).strftime('%b %d, %y')
+                prediction[key] = self.getPrediction2(
+                    prediction[oneDayBeforeKey],
+                    prediction[twoDaysBeforeKey]
+                )
+            if i >= 0:
+                threeDaysBeforeKey = (beginDateForDay + timedelta(days=i)).strftime('%b %d, %y')
+                prediction[key] = self.getPrediction3(
+                    prediction[oneDayBeforeKey],
+                    prediction[twoDaysBeforeKey],
+                    prediction[threeDaysBeforeKey]
+                )
+
+        data['dayWise'] = {
+            'label': label,
+            'volume': [],
+            'tk': [],
+            'prediction': []
+        }
+
+        for i in range(0, dayCount + 2):
+            data['dayWise']['volume'].append(volume[label[i]])
+            data['dayWise']['tk'].append(tk[label[i]])
+            data['dayWise']['prediction'].append(prediction[label[i]])
+
         return Response(data)
 
 

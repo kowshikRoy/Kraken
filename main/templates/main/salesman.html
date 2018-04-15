@@ -6,7 +6,7 @@
     <div class="main-content">
         <div class="container-fluid">
             <h3 class="page-title">{{salesman.name}}</h3>
-            {% include 'main/includes/chart.html' with monthYearOption="yes" id="salesmanTime" heading="Salesman behavior" %}
+            {% include 'main/includes/chart.html' with dayMonthYearOption="yes" id="salesmanTime" heading="Salesman behavior" %}
             {% include 'main/includes/chart2.html' with id="chart-SalesMan" title="Salesman analysis" heading="SalesMan" control="yes"%}
             {% include 'main/includes/tableView.html' with title="Most sold products" heading="Product" control="no" %}
         </div>
@@ -18,7 +18,7 @@
 {% block stat %}
 <script type="text/javascript">
 
-    function LoadProduct(salesman = null, beginDate = null, endDate = null, monthYear = 'year') {
+    function LoadProduct(salesman = null, beginDate = null, endDate = null, dayMonthYear = 'year') {
         $.ajax({
             method: "GET",
             url: '/api/LoadProduct/' ,
@@ -29,17 +29,19 @@
             },
             success: function(data) {
                 document.getElementById("salesmanTime-area").innerHTML = '<canvas id="chart-salesmanTime" height="120"></canvas>';
-                if (monthYear == 'year') {
-                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['year']);
-                } else if (monthYear == 'month') {
-                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['onlyThisYear']);
+                if (dayMonthYear == 'day') {
+                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['dayWise']);
+                } else if (dayMonthYear == 'month') {
+                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['monthWise']);
+                } else if (dayMonthYear == 'year') {
+                    drawChartWithPrediction(document.getElementById('chart-salesmanTime'),'line' , data['yearWise']);
                 }
             },
         });
     }
 
-    function handleMonthYearSelection(monthYearOption) {
-        LoadProduct("{{salesman.id}}", null, null, monthYearOption.value);
+    function handleDayMonthYearSelection(dayMonthYearOption) {
+        LoadProduct("{{salesman.id}}", null, null, dayMonthYearOption.value);
     }
       
    $(function() {

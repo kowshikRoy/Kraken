@@ -6,8 +6,8 @@
     <div class="main-content">
         <div class="container-fluid">
 
-            {% include 'main/includes/chart.html' with id="productTime" heading="Product behavior over all the years" %}
-            {% include 'main/includes/chart.html' with id="productOnly" heading="Product behavior in last 12 months" %}
+            {% include 'main/includes/chart.html' with id="product-month-wise" heading="Product behavior in last 12 months" %}
+            {% include 'main/includes/chart.html' with id="product-year-wise" heading="Product behavior over all the years" %}
             {% include 'main/includes/tableView.html' with title="Products" heading="Product" %}
             {% include 'main/includes/chart.html' with id="percentile-product" heading="Products percentile" %}
             <div id="compare">
@@ -33,10 +33,10 @@
                         'product'   : product,
                   },
                   success: function(data){
-                      document.getElementById("productOnly-area").innerHTML = '<canvas id="chart-productOnly" height="120"></canvas>';
-                      drawChart(document.getElementById('chart-productOnly'),'line', data['onlyThisYear']);
-                      document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
-                      drawChart(document.getElementById('chart-productTime'),'line' , data['year'] );
+                      document.getElementById("product-month-wise-area").innerHTML = '<canvas id="chart-product-month-wise" height="120"></canvas>';
+                      drawChart(document.getElementById('chart-product-month-wise'),'line', data['monthWise']);
+                      document.getElementById("product-year-wise-area").innerHTML = '<canvas id="chart-product-year-wise" height="120"></canvas>';
+                      drawChart(document.getElementById('chart-product-year-wise'),'line' , data['yearWise'] );
                   } ,
             });
       }

@@ -6,7 +6,7 @@
     <div class="main-content">
       	<div class="container-fluid">
             <h3 class="page-title">{{product.name}}</h3>
-            {% include 'main/includes/chart.html' with monthYearOption="yes" id="productTime" heading="Product behavior" %}
+            {% include 'main/includes/chart.html' with dayMonthYearOption="yes" id="productTime" heading="Product behavior" %}
             {% include 'main/includes/chart2.html' with id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
         </div>
     </div>
@@ -16,8 +16,7 @@
 
 {% block stat %}
 <script type="text/javascript">
-  function LoadProduct(product = null, beginDate = null, endDate = null, monthYear = 'year') {
-      console.log(monthYear);
+  function LoadProduct(product = null, beginDate = null, endDate = null, dayMonthYear = 'day') {
         $.ajax({
               method      :"GET",
               url         :'/api/LoadProduct/' ,
@@ -27,21 +26,24 @@
                     'product'   : product
               },
               success: function(data){
-                    console.log(data['onlyThisYear']);
-                    if (monthYear == 'year') {
+                    console.log(data)
+                    if (dayMonthYear == 'day') {
                         document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
-                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['year']);
-                    } else if (monthYear == 'month') {
-                        document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
-                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['onlyThisYear']);
+                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['dayWise']);
                     }
-                    drawChart(document.getElementById('productOnly'),'line', data['onlyThisYear']);
+                    else if (dayMonthYear == 'month') {
+                        document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
+                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['monthWise']);
+                    } else if (dayMonthYear == 'year') {
+                        document.getElementById("productTime-area").innerHTML = '<canvas id="chart-productTime" height="120"></canvas>';
+                        drawChartWithPrediction(document.getElementById('chart-productTime'),'line' , data['yearWise']);
+                    }
               } ,
         });
   }
 
-  function handleMonthYearSelection(monthYearOption) {
-    LoadProduct("{{product.id}}", null, null, monthYearOption.value);
+  function handleDayMonthYearSelection(dayMonthYearOption) {
+    LoadProduct("{{product.id}}", null, null, dayMonthYearOption.value);
   }
 
   function LoadPrediction(modelName, queryId) {

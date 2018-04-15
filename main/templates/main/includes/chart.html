@@ -4,15 +4,22 @@
 			<div class="panel-heading">
 				<h3 class="panel-title"><strong>{{heading}}</strong></h3>
 			</div>
+			{% if dateChooser == 'yes' %}
+				{% include 'main/includes/date-chooser.html' with id=id|add:"-date-chooser" %}
+			{% endif %}
 			<div class="panel-body">
-				{% if monthYearOption == 'yes' %}
+				{% if dayMonthYearOption == 'yes' %}
 					<label class="radio-inline active">
-						<input type="radio" name="monthYearOption" onclick="handleMonthYearSelection(this);" value="year" checked="">
-						Year
+						<input type="radio" name="dayMonthYearOption" onclick="handleDayMonthYearSelection(this);" value="day" checked="">
+						Day-wise
 					</label>
 					<label class="radio-inline">
-						<input type="radio" name="monthYearOption" onclick="handleMonthYearSelection(this);" value="month">
-						Month
+						<input type="radio" name="dayMonthYearOption" onclick="handleDayMonthYearSelection(this);" value="month">
+						Month-wise
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="dayMonthYearOption" onclick="handleDayMonthYearSelection(this);" value="year">
+						Year-wise
 					</label>
 				{% endif %}
 				<div id="{{id}}-area"></div>
