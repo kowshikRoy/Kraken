@@ -120,11 +120,12 @@ function LoadDefault(modelName, queryType, page = 1) {
   });
 }
 
-function LoadDistribution (modelName) {
+function LoadDistribution (product, modelName) {
     $.ajax({
         method: "GET",
         url: "/api/distribution/",
         data: {
+            product: product,
             modelName: modelName
         },
         success: function(data) {

@@ -8,6 +8,7 @@
             <h3 class="page-title">{{product.name}}</h3>
             {% include 'main/includes/chart.html' with dayMonthYearOption="yes" id="productTime" heading="Product behavior" %}
             {% include 'main/includes/chart2.html' with id="chart-Product" title="Product analysis" heading="Product" control="yes"%}
+            {% include 'main/includes/distribution-graph.html' with id="distribution-Region" title="Purchase distribution (in Tk) among regions" %}
         </div>
     </div>
 </div>
@@ -63,8 +64,7 @@
             LoadChart("Product", null, null, {{product.id}}, null ,null, null);
             LoadProduct("{{product.id}}");
             LoadPrediction("Product", "{{product.id}}");
-
-
+            LoadDistribution("{{product.id}}", "Region");
       });
 
    $("form").submit(function(event){

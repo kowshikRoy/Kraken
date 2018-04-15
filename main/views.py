@@ -1,3 +1,4 @@
+import operator
 from datetime import date, timedelta, datetime
 
 from django.contrib.auth import login, authenticate, logout
@@ -315,16 +316,42 @@ class DistributionView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        model = ResolveModel(request.GET['modelName'])
-        q = model.objects.all().order_by('-amount')
-        totalAmount = 0
-        for d in q:
-            totalAmount = totalAmount + d.amount
-        data = {
-            'labels': [d.name + ' (' + str(round((d.amount * 100) / totalAmount, 2)) + '%)' for d in q],
-            'amounts': [d.amount for d in q]
-        }
-        return Response(data)
+        if 'product' in request.GET and request.GET['product'] != '':
+            transactions = Transaction.objects.all()
+            transactions = transactions.filter(t_type='PURCHASE')
+            transactions = transactions.filter(product__id=request.GET['product'])
+            totalAmount = 0
+            tk = {}
+            for t in transactions:
+                totalAmount += t.amount
+                key = '-'
+                if request.GET['modelName'] == 'Region':
+                    key = t.client.region
+                if key in tk:
+                    tk[key] += t.amount
+                else:
+                    tk[key] = t.amount
+
+            sorted_tk = sorted(tk.items(), key=operator.itemgetter(1))
+            data = {
+                'labels': [],
+                'amounts': []
+            }
+            for key, value in tk.items():
+                data['labels'].append(key.name + ' (' + str(round((value * 100) / totalAmount, 2)) + '%)')
+                data['amounts'].append(value)
+            return Response(data)
+        else:
+            model = ResolveModel(request.GET['modelName'])
+            q = model.objects.all().order_by('-amount')
+            totalAmount = 0
+            for d in q:
+                totalAmount = totalAmount + d.amount
+            data = {
+                'labels': [d.name + ' (' + str(round((d.amount * 100) / totalAmount, 2)) + '%)' for d in q],
+                'amounts': [d.amount for d in q]
+            }
+            return Response(data)
 
 
 class CompareView(APIView):
